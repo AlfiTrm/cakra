@@ -1,0 +1,71 @@
+.text-display-lg {
+  font: 700 var(--text-display-lg) / var(--leading-display-lg) var(--font-sans);
+}
+
+.text-display-sm {
+  font: 700 var(--text-display-sm) / var(--leading-display-sm) var(--font-sans);
+}
+
+.text-heading-xl {
+  font: 600 var(--text-heading-xl) / var(--leading-heading-xl) var(--font-sans);
+}
+
+.text-heading-lg {
+  font: 600 var(--text-heading-lg) / var(--leading-heading-lg) var(--font-sans);
+}
+
+.text-heading-md {
+  font: 600 var(--text-heading-md) / var(--leading-heading-md) var(--font-sans);
+}
+
+.text-heading-sm {
+  font: 600 var(--text-heading-sm) / var(--leading-heading-sm) var(--font-sans);
+}
+
+.text-body-lg {
+  font: 400 var(--text-body-lg) / var(--leading-body-lg) var(--font-sans);
+}
+
+.text-body-md {
+  font: 400 var(--text-body-md) / var(--leading-body-md) var(--font-sans);
+}
+
+.text-body-sm {
+  font: 400 var(--text-body-sm) / var(--leading-body-sm) var(--font-sans);
+}
+
+.text-body-xs {
+  font: 400 var(--text-body-xs) / var(--leading-body-xs) var(--font-sans);
+}
+
+.text-label-lg {
+  font: 500 var(--text-label-lg) / var(--leading-label-lg) var(--font-sans);
+}
+
+.text-label-md {
+  font: 500 var(--text-label-md) / var(--leading-label-md) var(--font-sans);
+}
+
+.text-label-sm {
+  font: 500 var(--text-label-sm) / var(--leading-label-sm) var(--font-sans);
+}
+
+.text-data-xl {
+  font: 700 var(--text-data-xl) / var(--leading-data-xl) var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.text-data-lg {
+  font: 700 var(--text-data-lg) / var(--leading-data-lg) var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.text-data-md {
+  font: 500 var(--text-data-md) / var(--leading-data-md) var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.text-data-sm {
+  font: 500 var(--text-data-sm) / var(--leading-data-sm) var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
