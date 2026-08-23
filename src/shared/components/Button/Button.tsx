@@ -23,7 +23,11 @@ export function Button({ children, className = '', icon, type = 'button', varian
   return (
     <button className={`${baseClass} ${variantClass[variant]} ${className}`.trim()} type={type} {...props}>
       <span className="relative z-10">{children}</span>
-      {icon ? <Icon aria-hidden="true" className="relative z-10 size-4" icon={icon} /> : null}
+      {icon ? (
+        <span className="relative z-10 grid size-4 shrink-0 place-items-center">
+          <Icon aria-hidden="true" className="size-4" icon={icon} />
+        </span>
+      ) : null}
     </button>
   )
 }
