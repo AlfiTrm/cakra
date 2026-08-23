@@ -2,11 +2,12 @@ import { Icon } from '@iconify/react'
 import logoPrimary from '../../../assets/brand/logo-primary-default.svg'
 import { AuthDecorPanel, AuthInput } from '../components'
 import type { FormEvent } from 'react'
+import { navigateTo } from '../../../shared/utils/navigation'
 
 export function LoginPage() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    window.location.href = '/dashboard'
+    navigateTo('/dashboard')
   }
 
   return (
@@ -34,7 +35,7 @@ export function LoginPage() {
 
               <button
                 className="mt-7 flex h-12 w-full items-center justify-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white px-5 text-label-md font-bold text-[var(--color-text)] transition-colors hover:border-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-primary-200)]"
-                onClick={() => (window.location.href = '/dashboard')}
+                onClick={() => navigateTo('/dashboard')}
                 type="button"
               >
                 <span className="grid size-4 shrink-0 place-items-center">

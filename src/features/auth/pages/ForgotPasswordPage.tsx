@@ -1,11 +1,12 @@
 import logoPrimary from '../../../assets/brand/logo-primary-default.svg'
 import { AuthDecorPanel, AuthInput } from '../components'
 import type { FormEvent } from 'react'
+import { navigateTo } from '../../../shared/utils/navigation'
 
 export function ForgotPasswordPage() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    window.location.href = '/auth/forgot-password/otp'
+    navigateTo('/auth/forgot-password/otp')
   }
 
   return (

@@ -1,5 +1,9 @@
+import { useEffect, useState } from 'react'
 import { HomePage } from '../features/home/pages/HomePage'
+import { Footer } from '../features/home/components/Footer'
 import { Navbar } from '../features/home/components/Navbar'
+import { LoadingPage, NotFoundPage } from '../shared/components'
+import { NAVIGATION_EVENT } from '../shared/utils/navigation'
 import { RegisterPage } from '../features/auth/pages/RegisterPage'
 import { RegisterOtpPage } from '../features/auth/pages/RegisterOtpPage'
 import { CreatePasswordPage } from '../features/auth/pages/CreatePasswordPage'
@@ -9,55 +13,132 @@ import { LoginPage } from '../features/auth/pages/LoginPage'
 import { ResetPasswordPage } from '../features/auth/pages/ResetPasswordPage'
 
 function App() {
-  if (window.location.pathname === '/privacy') {
+  const [isLoading, setIsLoading] = useState(false)
+  const [path, setPath] = useState(window.location.pathname)
+
+  useEffect(() => {
+    let timeoutId: number
+
+    function openPath(nextPath: string, replace = false) {
+      if (nextPath === window.location.pathname) return
+
+      setIsLoading(true)
+      timeoutId = window.setTimeout(() => {
+        window.history[replace ? 'replaceState' : 'pushState']({}, '', nextPath)
+        setPath(window.location.pathname)
+        window.scrollTo({ top: 0 })
+        setIsLoading(false)
+      }, 260)
+    }
+
+    function handleNavigate(event: Event) {
+      openPath((event as CustomEvent<string>).detail)
+    }
+
+    function handlePopState() {
+      setIsLoading(true)
+      timeoutId = window.setTimeout(() => {
+        setPath(window.location.pathname)
+        setIsLoading(false)
+      }, 180)
+    }
+
+    function handleClick(event: MouseEvent) {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+        return
+      }
+
+      const link = (event.target as Element).closest<HTMLAnchorElement>('a[href]')
+      if (!link || link.target || link.hasAttribute('download')) return
+
+      const url = new URL(link.href)
+      if (url.origin !== window.location.origin || url.pathname === window.location.pathname) return
+
+      event.preventDefault()
+      openPath(url.pathname)
+    }
+
+    window.addEventListener(NAVIGATION_EVENT, handleNavigate)
+    window.addEventListener('popstate', handlePopState)
+    document.addEventListener('click', handleClick)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+      window.removeEventListener(NAVIGATION_EVENT, handleNavigate)
+      window.removeEventListener('popstate', handlePopState)
+      document.removeEventListener('click', handleClick)
+    }
+  }, [])
+
+  if (isLoading) {
+    return <LoadingPage />
+  }
+
+  if (path === '/privacy') {
     return <LegalPage title="Kebijakan Privasi" />
   }
 
-  if (window.location.pathname === '/terms') {
+  if (path === '/terms') {
     return <LegalPage title="Syarat Ketentuan Layanan" />
   }
 
-  if (window.location.pathname === '/history') {
+  if (path === '/history') {
     return <AppPlaceholder title="Riwayat" />
   }
 
-  if (window.location.pathname === '/analysis/new') {
+  if (path === '/analysis/new') {
     return <AppPlaceholder title="Analisis Baru" />
   }
 
-  if (window.location.pathname === '/dashboard') {
+  if (path === '/dashboard') {
     return <AppPlaceholder title="Dashboard" />
   }
 
-  if (window.location.pathname === '/auth/reset-password') {
+  if (path === '/auth/reset-password') {
     return <ResetPasswordPage />
   }
 
-  if (window.location.pathname === '/auth/forgot-password/otp') {
+  if (path === '/auth/forgot-password/otp') {
     return <ForgotPasswordOtpPage />
   }
 
-  if (window.location.pathname === '/auth/forgot-password') {
+  if (path === '/auth/forgot-password') {
     return <ForgotPasswordPage />
   }
 
-  if (window.location.pathname === '/auth/login') {
+  if (path === '/auth/login') {
     return <LoginPage />
   }
 
-  if (window.location.pathname === '/auth/register/password') {
+  if (path === '/auth/register/password') {
     return <CreatePasswordPage />
   }
 
-  if (window.location.pathname === '/auth/register/otp') {
+  if (path === '/auth/register/otp') {
     return <RegisterOtpPage />
   }
 
-  if (window.location.pathname === '/auth/register') {
+  if (path === '/auth/register') {
     return <RegisterPage />
   }
 
-  return <HomePage />
+  if (path === '/') {
+    return <HomePage />
+  }
+
+  return <NotFoundRoute path={path} />
+}
+
+function NotFoundRoute({ path }: { path: string }) {
+  const isAppRoute = ['/dashboard', '/analysis', '/history', '/settings'].some((appPath) => path.startsWith(appPath))
+
+  return (
+    <>
+      <Navbar variant={isAppRoute ? 'app' : 'public'} />
+      <NotFoundPage />
+      {isAppRoute ? null : <Footer />}
+    </>
+  )
 }
 
 function AppPlaceholder({ title }: { title: string }) {
