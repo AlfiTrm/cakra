@@ -1,9 +1,7 @@
+import { HomePage } from '../features/home/pages/HomePage'
+
 function App() {
-  return (
-    <main className="app-container">
-      <h1 className="text-display-sm">Cakra</h1>
-    </main>
-  )
+  return <HomePage />
 }
 
 export default App

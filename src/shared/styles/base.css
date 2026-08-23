@@ -36,7 +36,7 @@ button {
 
 @media (min-width: 768px) {
   :root {
-    --container-padding: var(--space-6);
+    --container-padding: var(--space-8);
   }
 }
 

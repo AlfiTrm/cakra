@@ -164,7 +164,7 @@
   --container-md: 768px;
   --container-lg: 1024px;
   --container-xl: 1200px;
-  --container-padding: var(--space-4);
+  --container-padding: var(--space-6);
 
   --radius-none: 0;
   --radius-sm: 4px;
