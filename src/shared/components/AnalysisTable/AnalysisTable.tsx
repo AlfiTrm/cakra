@@ -13,6 +13,7 @@ export type AnalysisTableRow = {
 }
 
 type AnalysisTableProps = {
+  emptyMessage?: string
   maxBodyHeight?: number
   rows: AnalysisTableRow[]
   showActions?: boolean
@@ -24,7 +25,9 @@ const statusClass: Record<AnalysisRiskStatus, string> = {
   'Stok Mati': 'bg-[var(--color-neutral-100)] text-[var(--color-neutral-600)]',
 }
 
-export function AnalysisTable({ maxBodyHeight, rows, showActions = false }: AnalysisTableProps) {
+export function AnalysisTable({ emptyMessage = 'Belum ada hasil analisis.', maxBodyHeight, rows, showActions = false }: AnalysisTableProps) {
+  const columnCount = showActions ? 7 : 6
+
   return (
     <div className="overflow-auto" style={maxBodyHeight ? { maxHeight: maxBodyHeight } : undefined}>
       <table className="w-full min-w-[980px] border-collapse text-left">
@@ -40,6 +43,13 @@ export function AnalysisTable({ maxBodyHeight, rows, showActions = false }: Anal
           </tr>
         </thead>
         <tbody>
+          {rows.length === 0 ? (
+            <tr>
+              <td className="px-6 py-12 text-center text-body-md text-[var(--color-text-muted)]" colSpan={columnCount}>
+                {emptyMessage}
+              </td>
+            </tr>
+          ) : null}
           {rows.map((analysis, index) => {
             const rowBg = index % 2 === 1 ? 'bg-[var(--color-neutral-50)]' : 'bg-white'
 

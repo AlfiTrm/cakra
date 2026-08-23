@@ -1,9 +1,11 @@
 import { Icon } from '@iconify/react'
 import type { InputHTMLAttributes } from 'react'
 
-type SearchInputProps = InputHTMLAttributes<HTMLInputElement>
+type SearchInputProps = InputHTMLAttributes<HTMLInputElement> & {
+  isLoading?: boolean
+}
 
-export function SearchInput({ className = '', ...props }: SearchInputProps) {
+export function SearchInput({ className = '', isLoading = false, ...props }: SearchInputProps) {
   return (
     <label className={`relative block ${className}`.trim()}>
       <span className="sr-only">{props['aria-label'] ?? 'Cari'}</span>
@@ -13,10 +15,17 @@ export function SearchInput({ className = '', ...props }: SearchInputProps) {
         icon="lucide:search"
       />
       <input
-        className="h-10 w-full rounded-[var(--radius-full)] border border-[var(--color-border)] bg-white px-5 pl-11 text-label-md text-[var(--color-text)] outline-none transition-colors placeholder:text-[var(--color-neutral-400)] focus:border-[var(--color-primary)] focus:ring-3 focus:ring-[var(--color-primary-100)]"
+        className="h-10 w-full rounded-[var(--radius-full)] border border-[var(--color-border)] bg-white px-5 pl-11 pr-11 text-label-md text-[var(--color-text)] outline-none transition-colors placeholder:text-[var(--color-neutral-400)] focus:border-[var(--color-primary)] focus:ring-3 focus:ring-[var(--color-primary-100)]"
         type="search"
         {...props}
       />
+      {isLoading ? (
+        <Icon
+          aria-hidden="true"
+          className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 animate-spin text-[var(--color-primary)]"
+          icon="lucide:loader-circle"
+        />
+      ) : null}
     </label>
   )
 }

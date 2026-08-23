@@ -1,25 +1,33 @@
 import { Button } from '../../../shared/components'
+import type { CreditUsage } from '../types/dashboard'
 
-export function CreditUsageCard() {
+type CreditUsageCardProps = {
+  usage: CreditUsage
+}
+
+export function CreditUsageCard({ usage }: CreditUsageCardProps) {
+  const totalCredits = Math.max(usage.balance, usage.availableCredits + usage.reservedCredits, 1)
+  const remainingPercent = Math.round((usage.availableCredits / totalCredits) * 100)
+
   return (
     <section className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-sm">
       <h2 className="text-heading-sm text-[var(--color-text)]">Kuota Kredit & Penggunaan</h2>
 
       <div className="mt-7 flex items-end justify-between gap-4">
         <p className="text-body-md font-semibold text-[var(--color-text-muted)]">
-          <span className="font-mono text-[40px] font-extrabold leading-none text-[var(--color-primary)]">18</span>
-          <span className="ml-2">/ 50 Kredit sisa</span>
+          <span className="font-mono text-[40px] font-extrabold leading-none text-[var(--color-primary)]">{usage.availableCredits}</span>
+          <span className="ml-2">/ {totalCredits} Kredit sisa</span>
         </p>
         <p className="text-body-sm text-[var(--color-text-muted)]">Reset otomatis: 01 Apr</p>
       </div>
 
       <div className="mt-6">
         <div className="h-3 overflow-hidden rounded-[var(--radius-full)] bg-[var(--color-neutral-200)]">
-          <div className="h-full w-[36%] rounded-[var(--radius-full)] bg-[var(--color-primary)]" />
+          <div className="h-full rounded-[var(--radius-full)] bg-[var(--color-primary)]" style={{ width: `${remainingPercent}%` }} />
         </div>
         <div className="mt-3 flex items-center justify-between gap-4 text-body-sm">
-          <p className="text-[var(--color-text-muted)]">Penggunaan bulan ini: 32 SKU</p>
-          <p className="font-bold text-[var(--color-primary)]">36% Tersisa</p>
+          <p className="text-[var(--color-text-muted)]">Penggunaan bulan ini: {usage.usedThisMonth} SKU</p>
+          <p className="font-bold text-[var(--color-primary)]">{remainingPercent}% Tersisa</p>
         </div>
       </div>
 
