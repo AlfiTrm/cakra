@@ -3,11 +3,13 @@ import { useState } from 'react'
 import logoPrimary from '../../../assets/brand/logo-primary-default.svg'
 import logoSecondary from '../../../assets/brand/logo-secondary-default.svg'
 import { Button } from '../../../shared/components'
+import { getStoredUserName } from '../../../shared/services/authToken'
 import { navigateTo } from '../../../shared/utils/navigation'
 
 type NavbarVariant = 'public' | 'app'
 
 type NavbarProps = {
+  userName?: string
   variant?: NavbarVariant
 }
 
@@ -23,12 +25,13 @@ const appLinks = [
   { href: '/history', label: 'Riwayat' },
 ]
 
-export function Navbar({ variant = 'public' }: NavbarProps) {
+export function Navbar({ userName, variant = 'public' }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isMenuVisible, setIsMenuVisible] = useState(false)
   const isPublic = variant === 'public'
   const links = isPublic ? publicLinks : appLinks
   const currentPath = window.location.pathname
+  const displayName = userName ?? getStoredUserName() ?? 'Pengguna'
 
   function openMenu() {
     setIsMenuOpen(true)
@@ -82,10 +85,10 @@ export function Navbar({ variant = 'public' }: NavbarProps) {
           ) : (
             <div className="z-10 hidden items-center gap-3 border-l border-[var(--color-border)] pl-6 lg:flex">
               <div className="grid size-10 place-items-center rounded-full bg-[var(--color-primary-100)] text-label-md text-[var(--color-primary)]">
-                R
+                {displayName.charAt(0).toUpperCase()}
               </div>
               <div>
-                <p className="text-label-md text-[var(--color-text)]">Ratna</p>
+                <p className="text-label-md text-[var(--color-text)]">{displayName}</p>
                 <p className="text-body-xs text-[var(--color-text-muted)]">Premium Member</p>
               </div>
             </div>
@@ -161,10 +164,10 @@ export function Navbar({ variant = 'public' }: NavbarProps) {
             ) : (
               <div className="flex items-center gap-3 border-t border-[var(--color-border)] pt-6">
                 <div className="grid size-11 place-items-center rounded-full bg-[var(--color-primary-100)] text-label-md text-[var(--color-primary)]">
-                  R
+                  {displayName.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <p className="text-label-md text-[var(--color-text)]">Ratna</p>
+                  <p className="text-label-md text-[var(--color-text)]">{displayName}</p>
                   <p className="text-body-xs text-[var(--color-text-muted)]">Premium Member</p>
                 </div>
               </div>

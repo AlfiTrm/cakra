@@ -15,6 +15,11 @@ export function AttentionSkuCard({ items }: AttentionSkuCardProps) {
       <h2 className="text-heading-sm text-[var(--color-text)]">SKU Perlu Perhatian Segera</h2>
 
       <div className="mt-5 grid gap-4">
+        {items.length === 0 ? (
+          <div className="rounded-[var(--radius-lg)] bg-[var(--color-success-50)] px-8 py-5 text-body-sm font-semibold text-[var(--color-success)]">
+            Tidak ada SKU kritis saat ini.
+          </div>
+        ) : null}
         {items.map((item) => (
           <article className={`rounded-[var(--radius-lg)] px-8 py-4 ${toneClass[item.tone]}`} key={item.skuName}>
             <h3 className="text-label-md font-bold text-[var(--color-text)]">{item.skuName}</h3>

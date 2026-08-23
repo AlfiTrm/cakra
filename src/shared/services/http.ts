@@ -57,6 +57,7 @@ export async function httpWithResponse<T>(path: string, options: RequestOptions 
       })
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') {
+        if (options.signal?.aborted) throw err
         throw new Error('Request terlalu lama. Coba lagi.', { cause: err })
       }
 

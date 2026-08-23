@@ -4,9 +4,12 @@ import { navigateTo } from '../../../shared/utils/navigation'
 
 type LatestAnalysisTableProps = {
   analyses: LatestAnalysis[]
+  isSearching?: boolean
+  onSearchChange?: (value: string) => void
+  search?: string
 }
 
-export function LatestAnalysisTable({ analyses }: LatestAnalysisTableProps) {
+export function LatestAnalysisTable({ analyses, isSearching = false, onSearchChange, search = '' }: LatestAnalysisTableProps) {
   return (
     <section className="overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white shadow-sm">
       <header className="flex flex-col gap-5 bg-white px-6 py-5 md:flex-row md:items-center md:justify-between">
@@ -17,7 +20,14 @@ export function LatestAnalysisTable({ analyses }: LatestAnalysisTableProps) {
           </p>
         </div>
 
-        <SearchInput aria-label="Cari SKU" className="w-full md:w-[260px]" placeholder="Cari SKU..." />
+        <SearchInput
+          aria-label="Cari SKU"
+          className="w-full md:w-[260px]"
+          isLoading={isSearching}
+          onChange={(event) => onSearchChange?.(event.target.value)}
+          placeholder="Cari SKU..."
+          value={search}
+        />
       </header>
 
       <AnalysisTable maxBodyHeight={360} rows={analyses} />

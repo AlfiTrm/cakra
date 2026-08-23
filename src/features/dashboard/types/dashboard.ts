@@ -21,3 +21,18 @@ export type AttentionSku = {
   skuName: string
   tone: AttentionSkuTone
 }
+
+export type CreditUsage = {
+  availableCredits: number
+  balance: number
+  reservedCredits: number
+  usedThisMonth: number
+}
+
+export type DashboardViewModel = {
+  analyses: LatestAnalysis[]
+  attentionSkus: AttentionSku[]
+  creditUsage: CreditUsage
+  stats: DashboardStat[]
+  userName: string
+}
