@@ -31,7 +31,7 @@ export function Navbar({ variant = 'public' }: NavbarProps) {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-surface)]">
+      <header className="fixed inset-x-0 top-0 z-50 bg-[var(--color-surface)]">
         <nav className="app-container relative flex h-[72px] items-center justify-between gap-6">
           <a aria-label="Cakra home" className="z-10 shrink-0" href="/">
             <img alt="Cakra" className="hidden h-8 w-auto lg:block" src={logoPrimary} />

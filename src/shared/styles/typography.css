@@ -1,9 +1,9 @@
 .text-display-lg {
-  font: 700 var(--text-display-lg) / var(--leading-display-lg) var(--font-sans);
+  font: 800 var(--text-display-lg) / var(--leading-display-lg) var(--font-sans);
 }
 
 .text-display-sm {
-  font: 700 var(--text-display-sm) / var(--leading-display-sm) var(--font-sans);
+  font: 800 var(--text-display-sm) / var(--leading-display-sm) var(--font-sans);
 }
 
 .text-heading-xl {
