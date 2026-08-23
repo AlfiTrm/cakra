@@ -3,6 +3,7 @@ import { useState } from 'react'
 import logoPrimary from '../../../assets/brand/logo-primary-default.svg'
 import logoSecondary from '../../../assets/brand/logo-secondary-default.svg'
 import { Button } from '../../../shared/components'
+import { navigateTo } from '../../../shared/utils/navigation'
 
 type NavbarVariant = 'public' | 'app'
 
@@ -66,10 +67,10 @@ export function Navbar({ variant = 'public' }: NavbarProps) {
 
           {isPublic ? (
             <div className="z-10 hidden items-center gap-6 lg:flex">
-              <Button onClick={() => (window.location.href = '/auth/login')} variant="text">
+              <Button onClick={() => navigateTo('/auth/login')} variant="text">
                 Masuk
               </Button>
-              <Button icon="lucide:arrow-right" onClick={() => (window.location.href = '/auth/register')}>
+              <Button icon="lucide:arrow-right" onClick={() => navigateTo('/auth/register')}>
                 Mulai Gratis
               </Button>
             </div>
@@ -141,10 +142,10 @@ export function Navbar({ variant = 'public' }: NavbarProps) {
 
             {isPublic ? (
               <div className="grid gap-3">
-                <Button className="w-full" onClick={() => (window.location.href = '/auth/login')} variant="text">
+                <Button className="w-full" onClick={() => navigateTo('/auth/login')} variant="text">
                   Masuk
                 </Button>
-                <Button className="w-full" icon="lucide:arrow-right" onClick={() => (window.location.href = '/auth/register')}>
+                <Button className="w-full" icon="lucide:arrow-right" onClick={() => navigateTo('/auth/register')}>
                   Mulai Gratis
                 </Button>
               </div>

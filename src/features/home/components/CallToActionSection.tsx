@@ -1,6 +1,7 @@
 import { Icon } from '@iconify/react'
 import type { FormEvent } from 'react'
 import { useStaggerInView } from '../../../shared/hooks/useStaggerInView'
+import { navigateTo } from '../../../shared/utils/navigation'
 
 const notes = ['Gratis 10 kredit pertama', 'Tanpa kartu kredit', 'Setup 2 menit']
 
@@ -9,7 +10,7 @@ export function CallToActionSection() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    window.location.href = '/auth/register'
+    navigateTo('/auth/register')
   }
 
   return (

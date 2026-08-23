@@ -2,13 +2,14 @@ import { useState } from 'react'
 import logoPrimary from '../../../assets/brand/logo-primary-default.svg'
 import { AuthDecorPanel, OtpInput } from '../components'
 import type { FormEvent } from 'react'
+import { navigateTo } from '../../../shared/utils/navigation'
 
 export function RegisterOtpPage() {
   const [otp, setOtp] = useState('')
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    window.location.href = '/auth/register/password'
+    navigateTo('/auth/register/password')
   }
 
   return (

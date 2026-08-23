@@ -1,11 +1,12 @@
 import logoPrimary from '../../../assets/brand/logo-primary-default.svg'
 import { AuthDecorPanel, AuthInput } from '../components'
 import type { FormEvent } from 'react'
+import { navigateTo } from '../../../shared/utils/navigation'
 
 export function ResetPasswordPage() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    window.location.href = '/auth/login'
+    navigateTo('/auth/login')
   }
 
   return (

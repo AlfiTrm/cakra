@@ -1,5 +1,6 @@
 import illustShop from '../../../assets/img/public-site/illust-shop.webp'
 import { Button } from '../../../shared/components'
+import { navigateTo } from '../../../shared/utils/navigation'
 
 const marketplaceLogos = ['Tokopedia', 'Shopee', 'Grab', 'Bukalapak', 'Alfamart']
 
@@ -18,7 +19,7 @@ export function HeroSection() {
         </p>
 
         <div className="animate-stagger-rise mt-9 flex flex-col items-center gap-3 [--stagger-index:2] sm:flex-row">
-          <Button icon="lucide:arrow-right" onClick={() => (window.location.href = '/auth/register')}>
+          <Button icon="lucide:arrow-right" onClick={() => navigateTo('/auth/register')}>
             Mulai Sekarang
           </Button>
           <Button onClick={() => (window.location.href = 'mailto:hello@cakra.ai')} variant="outline">

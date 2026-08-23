@@ -1,6 +1,7 @@
 import { Icon } from '@iconify/react'
 import type { CSSProperties } from 'react'
 import { useStaggerInView } from '../../../shared/hooks/useStaggerInView'
+import { navigateTo } from '../../../shared/utils/navigation'
 
 const plans = [
   {
@@ -105,7 +106,7 @@ export function PricingSection() {
                       ? 'bg-white text-[var(--color-primary)] hover:bg-[var(--color-primary-50)]'
                       : 'bg-[var(--color-neutral-900)] text-white hover:bg-[var(--color-primary)]'
                   }`}
-                  onClick={() => (window.location.href = '/auth/register')}
+                  onClick={() => navigateTo('/auth/register')}
                   type="button"
                 >
                   {plan.cta}
