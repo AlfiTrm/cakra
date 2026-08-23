@@ -1,0 +1,101 @@
+import type { AnalysisTableRow } from '../../../shared/components'
+import type { DashboardStat } from '../../dashboard/types/dashboard'
+
+export const historyStats: DashboardStat[] = [
+  {
+    change: '',
+    description: 'Telah dianalisis dalam sistem',
+    label: 'Total Analisis',
+    tone: 'primary',
+    value: '32 SKU',
+  },
+  {
+    change: '',
+    description: 'Berdasarkan data historis aktual',
+    label: 'Rata-rata Akurasi',
+    tone: 'info',
+    value: '94.2%',
+  },
+  {
+    change: '',
+    description: 'Membutuhkan restock segera',
+    label: 'SKU Berisiko',
+    tone: 'danger',
+    value: '3 SKU',
+  },
+]
+
+export const historyAnalyses: AnalysisTableRow[] = [
+  {
+    category: 'Kebutuhan Pokok',
+    date: '12 Mar 2026',
+    id: '383002',
+    rop: 45,
+    roq: 120,
+    skuName: 'Minyak Goreng Bimoli 2L',
+    status: 'Hampir Habis',
+  },
+  {
+    category: 'Makanan Instan',
+    date: '11 Mar 2026',
+    id: '398131',
+    rop: 156,
+    roq: 480,
+    skuName: 'Indomie Goreng Spesial',
+    status: 'Normal',
+  },
+  {
+    category: 'Kebutuhan Pokok',
+    date: '10 Mar 2026',
+    id: '734723',
+    rop: 30,
+    roq: 90,
+    skuName: 'Gula Pasir Gulaku 1kg',
+    status: 'Hampir Habis',
+  },
+  {
+    category: 'Perawatan Tubuh',
+    date: '09 Mar 2026',
+    id: '119169',
+    rop: 15,
+    roq: 40,
+    skuName: 'Sabun Mandi Lifebuoy 100g',
+    status: 'Stok Mati',
+  },
+  {
+    category: 'Minuman',
+    date: '08 Mar 2026',
+    id: '458348',
+    rop: 80,
+    roq: 286,
+    skuName: 'Teh Pucuk Harum 350ml',
+    status: 'Normal',
+  },
+  {
+    category: 'Minuman',
+    date: '07 Mar 2026',
+    id: '931740',
+    rop: 120,
+    roq: 356,
+    skuName: 'Air Mineral Aqua 600ml',
+    status: 'Hampir Habis',
+  },
+  {
+    category: 'Bumbu Masak',
+    date: '06 Mar 2026',
+    id: '298412',
+    rop: 25,
+    roq: 75,
+    skuName: 'Kecap Manis ABC 275ml',
+    status: 'Normal',
+  },
+  {
+    category: 'Kebersihan',
+    date: '05 Mar 2026',
+    id: '554319',
+    rop: 10,
+    roq: 30,
+    skuName: 'Deterjen Rinso 800g',
+    status: 'Stok Mati',
+  },
+]
