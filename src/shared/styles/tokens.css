@@ -155,6 +155,17 @@
   --space-20: 80px;
   --space-24: 96px;
 
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1200px;
+  --container-padding: var(--space-4);
+
   --radius-none: 0;
   --radius-sm: 4px;
   --radius-md: 8px;
