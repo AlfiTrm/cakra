@@ -1,13 +1,41 @@
 import { Icon } from '@iconify/react'
+import { useState } from 'react'
 import logoPrimary from '../../../assets/brand/logo-primary-default.svg'
-import { AuthDecorPanel, AuthInput } from '../components'
+import { AuthDecorPanel, AuthInput, AuthSubmitButton } from '../components'
 import type { FormEvent } from 'react'
 import { navigateTo } from '../../../shared/utils/navigation'
+import { setRegisterSessionToken } from '../services/authStorage'
+import { startRegister } from '../services/authService'
 
 export function RegisterPage() {
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const [emailError, setEmailError] = useState('')
+  const [email, setEmail] = useState('')
+  const [error, setError] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const canSubmit = fullName.trim().length > 0 && isValidEmail(email)
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    navigateTo('/auth/register/otp')
+    setError('')
+    setEmailError('')
+
+    if (!isValidEmail(email)) {
+      setEmailError('Alamat email belum valid.')
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      const response = await startRegister({ email, full_name: fullName })
+      setRegisterSessionToken(response.data.session_token)
+      navigateTo('/auth/register/otp')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Gagal mengirim OTP.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -51,15 +79,32 @@ export function RegisterPage() {
               </div>
 
               <form className="grid gap-4" onSubmit={handleSubmit}>
-                <AuthInput label="Nama Lengkap" placeholder="Masukkan nama lengkap Anda" type="text" />
-                <AuthInput label="Alamat Email" placeholder="nama@toko.com" type="email" />
+                <AuthInput
+                  label="Nama Lengkap"
+                  onChange={(event) => setFullName(event.target.value)}
+                  placeholder="Masukkan nama lengkap Anda"
+                  required
+                  type="text"
+                  value={fullName}
+                />
+                <AuthInput
+                  error={emailError}
+                  label="Alamat Email"
+                  onChange={(event) => {
+                    setEmail(event.target.value)
+                    if (emailError) setEmailError('')
+                  }}
+                  placeholder="nama@toko.com"
+                  required
+                  type="email"
+                  value={email}
+                />
 
-                <button
-                  className="mt-3 h-12 rounded-[var(--radius-lg)] bg-[var(--color-primary)] px-6 text-label-md font-bold text-white shadow-lg shadow-[rgb(45_82_221_/_0.25)] transition-colors hover:bg-[var(--color-primary-hover)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-primary-200)]"
-                  type="submit"
-                >
+                {error ? <p className="text-body-sm font-semibold text-[var(--color-danger)]">{error}</p> : null}
+
+                <AuthSubmitButton className="mt-3 shadow-[rgb(45_82_221_/_0.25)]" disabled={!canSubmit} isLoading={isSubmitting}>
                   Daftar dengan Email
-                </button>
+                </AuthSubmitButton>
               </form>
 
             </div>
@@ -82,4 +127,8 @@ export function RegisterPage() {
       </div>
     </main>
   )
+}
+
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value) && !value.toLowerCase().endsWith('.con')
 }

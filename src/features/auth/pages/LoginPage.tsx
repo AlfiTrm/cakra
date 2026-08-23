@@ -1,13 +1,33 @@
 import { Icon } from '@iconify/react'
+import { useState } from 'react'
 import logoPrimary from '../../../assets/brand/logo-primary-default.svg'
-import { AuthDecorPanel, AuthInput } from '../components'
+import { AuthDecorPanel, AuthInput, AuthSubmitButton } from '../components'
 import type { FormEvent } from 'react'
 import { navigateTo } from '../../../shared/utils/navigation'
+import { setAccessToken } from '../services/authStorage'
+import { login } from '../services/authService'
 
 export function LoginPage() {
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const [email, setEmail] = useState('')
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [password, setPassword] = useState('')
+  const canSubmit = email.trim().length > 0 && password.length > 0
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    navigateTo('/dashboard')
+    setError('')
+    setIsSubmitting(true)
+
+    try {
+      const response = await login({ email, password })
+      setAccessToken(response.data.access_token)
+      navigateTo('/dashboard')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login gagal.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -51,8 +71,22 @@ export function LoginPage() {
               </div>
 
               <form className="grid gap-4" onSubmit={handleSubmit}>
-                <AuthInput defaultValue="pemilik.ritel@gmail.com" label="Alamat Email" type="email" />
-                <AuthInput defaultValue="rahasiatoko" label="Kata Sandi" type="password" />
+                <AuthInput
+                  label="Alamat Email"
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="nama@toko.com"
+                  required
+                  type="email"
+                  value={email}
+                />
+                <AuthInput
+                  label="Kata Sandi"
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="Masukkan kata sandi"
+                  required
+                  type="password"
+                  value={password}
+                />
 
                 <div className="mt-1 flex items-center justify-between text-label-sm">
                   <label className="flex items-center gap-2 font-semibold text-[var(--color-text)]">
@@ -64,12 +98,11 @@ export function LoginPage() {
                   </a>
                 </div>
 
-                <button
-                  className="mt-3 h-12 rounded-[var(--radius-lg)] bg-[var(--color-primary)] px-6 text-label-md font-bold text-white shadow-lg shadow-[rgb(45_82_221_/_0.25)] transition-colors hover:bg-[var(--color-primary-hover)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-primary-200)]"
-                  type="submit"
-                >
+                {error ? <p className="text-body-sm font-semibold text-[var(--color-danger)]">{error}</p> : null}
+
+                <AuthSubmitButton className="mt-3 shadow-[rgb(45_82_221_/_0.25)]" disabled={!canSubmit} isLoading={isSubmitting}>
                   Masuk
-                </button>
+                </AuthSubmitButton>
               </form>
             </div>
           </div>

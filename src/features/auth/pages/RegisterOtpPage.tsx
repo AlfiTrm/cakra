@@ -1,15 +1,71 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import logoPrimary from '../../../assets/brand/logo-primary-default.svg'
-import { AuthDecorPanel, OtpInput } from '../components'
+import { AuthDecorPanel, AuthSubmitButton, OtpInput } from '../components'
 import type { FormEvent } from 'react'
 import { navigateTo } from '../../../shared/utils/navigation'
+import { getRegisterSessionToken } from '../services/authStorage'
+import { resendRegisterOtp, verifyRegisterOtp } from '../services/authService'
 
 export function RegisterOtpPage() {
+  const [error, setError] = useState('')
+  const [isResending, setIsResending] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [message, setMessage] = useState('')
   const [otp, setOtp] = useState('')
+  const [shouldAutoSubmit, setShouldAutoSubmit] = useState(true)
+
+  useEffect(() => {
+    if (otp.length === 6 && shouldAutoSubmit && !isSubmitting) {
+      void submitOtp()
+    }
+  }, [isSubmitting, otp, shouldAutoSubmit])
+
+  async function submitOtp() {
+    const sessionToken = getRegisterSessionToken()
+    if (!sessionToken) {
+      navigateTo('/auth/register')
+      return
+    }
+
+    setError('')
+    setMessage('')
+    setIsSubmitting(true)
+
+    try {
+      await verifyRegisterOtp(sessionToken, otp)
+      navigateTo('/auth/register/password')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'OTP tidak valid.')
+      setShouldAutoSubmit(false)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    navigateTo('/auth/register/password')
+    void submitOtp()
+  }
+
+  async function handleResend() {
+    const sessionToken = getRegisterSessionToken()
+    if (!sessionToken) {
+      navigateTo('/auth/register')
+      return
+    }
+
+    setError('')
+    setMessage('')
+    setIsResending(true)
+
+    try {
+      const response = await resendRegisterOtp(sessionToken)
+      setMessage(response.message)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Gagal mengirim ulang OTP.')
+    } finally {
+      setIsResending(false)
+    }
   }
 
   return (
@@ -33,18 +89,33 @@ export function RegisterOtpPage() {
               </p>
 
               <form className="mt-8 grid gap-6" onSubmit={handleSubmit}>
-                <OtpInput value={otp} onChange={setOtp} />
+                <OtpInput
+                  hasError={Boolean(error)}
+                  value={otp}
+                  onChange={(nextOtp) => {
+                    setOtp(nextOtp)
+                    if (error) setError('')
+                  }}
+                />
 
-                <button
-                  className="h-12 rounded-[var(--radius-lg)] bg-[var(--color-primary)] px-6 text-label-md font-bold text-white shadow-lg shadow-[rgb(45_82_221_/_0.22)] transition-colors hover:bg-[var(--color-primary-hover)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-primary-200)]"
-                  type="submit"
-                >
+                {error ? <p className="text-body-sm font-semibold text-[var(--color-danger)]">{error}</p> : null}
+                {message ? <p className="text-body-sm font-semibold text-[var(--color-success)]">{message}</p> : null}
+
+                <AuthSubmitButton disabled={otp.length < 6} isLoading={isSubmitting}>
                   Verifikasi
-                </button>
+                </AuthSubmitButton>
               </form>
 
               <p className="mt-4 text-center text-body-md text-[var(--color-text-muted)]">
-                kirim ulang dalam <span className="font-bold text-[var(--color-primary)]">05.00</span>
+                Tidak menerima kode?{' '}
+                <button
+                  className="font-bold text-[var(--color-primary)] disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled={isResending}
+                  onClick={handleResend}
+                  type="button"
+                >
+                  {isResending ? 'Mengirim...' : 'Kirim ulang'}
+                </button>
               </p>
             </div>
           </div>

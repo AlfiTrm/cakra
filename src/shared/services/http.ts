@@ -1,8 +1,15 @@
 import { API_BASE_URL } from '../config/env'
+import { getAccessToken, logout } from './authToken'
 
 type RequestOptions = Omit<RequestInit, 'body'> & {
   body?: BodyInit | Record<string, unknown>
   timeoutMs?: number
+}
+
+export type HttpResult<T> = {
+  data: T
+  headers: Headers
+  status: number
 }
 
 export class HttpError extends Error {
@@ -17,6 +24,11 @@ export class HttpError extends Error {
 }
 
 export async function http<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const result = await httpWithResponse<T>(path, options)
+  return result.data
+}
+
+export async function httpWithResponse<T>(path: string, options: RequestOptions = {}): Promise<HttpResult<T>> {
   if (!API_BASE_URL) {
     throw new Error('VITE_BASE_API belum diset.')
   }
@@ -26,26 +38,46 @@ export async function http<T>(path: string, options: RequestOptions = {}): Promi
   const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs)
   const body = serializeBody(options.body)
   const isJson = typeof body === 'string' && typeof options.body !== 'string'
+  const token = getAccessToken()
 
   try {
-    const response = await fetch(buildUrl(path), {
-      ...requestOptions,
-      headers: {
-        Accept: 'application/json',
-        ...(isJson ? { 'Content-Type': 'application/json' } : {}),
-        ...options.headers,
-      },
-      body,
-      signal: options.signal ?? controller.signal,
-    })
+    let response: Response
+
+    try {
+      response = await fetch(buildUrl(path), {
+        ...requestOptions,
+        headers: {
+          Accept: 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(isJson ? { 'Content-Type': 'application/json' } : {}),
+          ...options.headers,
+        },
+        body,
+        signal: options.signal ?? controller.signal,
+      })
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        throw new Error('Request terlalu lama. Coba lagi.', { cause: err })
+      }
+
+      throw new Error('Tidak bisa terhubung ke server. Periksa koneksi atau coba lagi.', { cause: err })
+    }
 
     const data = await parseResponse(response)
 
     if (!response.ok) {
+      if (response.status === 401) {
+        logout()
+      }
+
       throw new HttpError(getErrorMessage(data), response.status, data)
     }
 
-    return data as T
+    return {
+      data: data as T,
+      headers: response.headers,
+      status: response.status,
+    }
   } finally {
     window.clearTimeout(timeoutId)
   }
