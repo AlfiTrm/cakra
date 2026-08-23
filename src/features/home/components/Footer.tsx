@@ -4,15 +4,30 @@ import logoNeutral from '../../../assets/brand/logo-primary-neutral.svg'
 const footerGroups = [
   {
     title: 'Fitur',
-    links: ['Prediksi AI', 'Risiko Stok', 'Rekomendasi', 'Per SKU'],
+    links: [
+      { href: '#fitur', label: 'Prediksi AI' },
+      { href: '#fitur', label: 'Risiko Stok' },
+      { href: '#fitur', label: 'Rekomendasi' },
+      { href: '#fitur', label: 'Per SKU' },
+    ],
   },
   {
     title: 'Perusahaan',
-    links: ['Tentang Kami', 'Karir', 'Mitra', 'Kontak'],
+    links: [
+      { href: '#cara-kerja', label: 'Tentang Kami' },
+      { href: 'mailto:hello@cakra.ai', label: 'Karir' },
+      { href: 'mailto:hello@cakra.ai', label: 'Mitra' },
+      { href: 'mailto:hello@cakra.ai', label: 'Kontak' },
+    ],
   },
   {
     title: 'Legal',
-    links: ['Ketentuan', 'Privasi', 'Kredit', 'FAQ'],
+    links: [
+      { href: '/terms', label: 'Ketentuan' },
+      { href: '/privacy', label: 'Privasi' },
+      { href: '#harga', label: 'Kredit' },
+      { href: '#faq', label: 'FAQ' },
+    ],
   },
 ]
 
@@ -25,7 +40,7 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="bg-[var(--color-neutral-900)] py-16 text-white md:py-20">
+    <footer className="bg-[var(--color-neutral-900)] py-16 text-white md:py-20" id="faq">
       <div className="app-container">
         <div className="grid gap-12 lg:grid-cols-[1fr_420px] lg:gap-20">
           <div>
@@ -42,9 +57,9 @@ export function Footer() {
                 <h2 className="text-label-md font-bold text-white">{group.title}</h2>
                 <ul className="mt-4 grid gap-3">
                   {group.links.map((link) => (
-                    <li key={link}>
-                      <a className="text-body-sm text-[var(--color-neutral-400)] hover:text-white" href="#">
-                        {link}
+                    <li key={link.label}>
+                      <a className="text-body-sm text-[var(--color-neutral-400)] hover:text-white" href={link.href}>
+                        {link.label}
                       </a>
                     </li>
                   ))}

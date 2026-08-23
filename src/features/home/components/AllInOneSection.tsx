@@ -30,6 +30,7 @@ export function AllInOneSection() {
 
   return (
     <section
+      id="fitur"
       ref={ref}
       className={`bg-[var(--color-surface)] py-16 md:py-24 ${isVisible ? 'is-stagger-visible' : ''}`}
     >

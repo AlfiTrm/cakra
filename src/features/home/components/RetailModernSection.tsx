@@ -12,6 +12,7 @@ export function RetailModernSection() {
 
   return (
     <section
+      id="cara-kerja"
       ref={ref}
       className={`bg-[var(--color-surface)] py-16 md:py-20 ${isVisible ? 'is-stagger-visible' : ''}`}
     >
