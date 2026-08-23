@@ -3,6 +3,7 @@ import { HomePage } from '../features/home/pages/HomePage'
 import { Footer } from '../features/home/components/Footer'
 import { Navbar } from '../features/home/components/Navbar'
 import { DashboardPage } from '../features/dashboard/pages/DashboardPage'
+import { HistoryPage } from '../features/history/pages/HistoryPage'
 import { LoadingPage, NotFoundPage } from '../shared/components'
 import { NAVIGATION_EVENT } from '../shared/utils/navigation'
 import { RegisterPage } from '../features/auth/pages/RegisterPage'
@@ -84,7 +85,7 @@ function App() {
   }
 
   if (path === '/history') {
-    return <AppPlaceholder title="Riwayat" />
+    return <HistoryPage />
   }
 
   if (path === '/analysis/new') {

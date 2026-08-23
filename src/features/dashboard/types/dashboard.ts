@@ -1,3 +1,5 @@
+import type { AnalysisRiskStatus, AnalysisTableRow } from '../../../shared/components'
+
 export type DashboardStatTone = 'primary' | 'success' | 'danger' | 'info'
 
 export type DashboardStat = {
@@ -8,17 +10,9 @@ export type DashboardStat = {
   value: string
 }
 
-export type RiskStatus = 'Hampir Habis' | 'Normal' | 'Stok Mati'
+export type RiskStatus = AnalysisRiskStatus
 
-export type LatestAnalysis = {
-  category: string
-  date: string
-  id: string
-  rop: number
-  roq: number
-  skuName: string
-  status: RiskStatus
-}
+export type LatestAnalysis = AnalysisTableRow
 
 export type AttentionSkuTone = 'danger' | 'warning'
 

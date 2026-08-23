@@ -28,6 +28,7 @@ export function Navbar({ variant = 'public' }: NavbarProps) {
   const [isMenuVisible, setIsMenuVisible] = useState(false)
   const isPublic = variant === 'public'
   const links = isPublic ? publicLinks : appLinks
+  const currentPath = window.location.pathname
 
   function openMenu() {
     setIsMenuOpen(true)
@@ -49,20 +50,24 @@ export function Navbar({ variant = 'public' }: NavbarProps) {
           </a>
 
           <div className="group/nav absolute left-1/2 hidden -translate-x-1/2 items-center gap-10 lg:flex">
-            {links.map((link, index) => (
-              <a
-                className="group/link flex flex-col items-center gap-2 text-label-md font-semibold text-[var(--color-text)] transition-colors hover:text-[var(--color-primary)]"
-                href={link.href}
-                key={link.label}
-              >
-                <span>{link.label}</span>
-                <span
-                  className={`h-0.5 w-10 origin-center rounded-full bg-[var(--color-primary)] transition-transform duration-200 ease-out group-hover/link:!scale-x-100 ${
-                    index === 0 ? 'scale-x-100 group-hover/nav:scale-x-0' : 'scale-x-0'
-                  }`}
-                />
-              </a>
-            ))}
+            {links.map((link, index) => {
+              const isActive = isPublic ? index === 0 : currentPath === link.href
+
+              return (
+                <a
+                  className="group/link flex flex-col items-center gap-2 text-label-md font-semibold text-[var(--color-text)] transition-colors hover:text-[var(--color-primary)]"
+                  href={link.href}
+                  key={link.label}
+                >
+                  <span>{link.label}</span>
+                  <span
+                    className={`h-0.5 w-10 origin-center rounded-full bg-[var(--color-primary)] transition-transform duration-200 ease-out group-hover/link:!scale-x-100 ${
+                      isActive ? 'scale-x-100 group-hover/nav:scale-x-0' : 'scale-x-0'
+                    }`}
+                  />
+                </a>
+              )
+            })}
           </div>
 
           {isPublic ? (
@@ -124,20 +129,24 @@ export function Navbar({ variant = 'public' }: NavbarProps) {
             }`}
           >
             <div className="grid gap-5">
-              {links.map((link, index) => (
-                <a
-                  className={`text-heading-lg rounded-[var(--radius-xl)] px-5 py-4 font-semibold transition-colors ${
-                    index === 0
-                      ? '-mx-[var(--container-padding)] rounded-none bg-[var(--color-primary)] px-[calc(var(--container-padding)+var(--space-5))] text-white'
-                      : 'text-[var(--color-text)] active:bg-[var(--color-primary-50)]'
-                  }`}
-                  href={link.href}
-                  key={link.label}
-                  onClick={closeMenu}
-                >
-                  {link.label}
-                </a>
-              ))}
+              {links.map((link, index) => {
+                const isActive = isPublic ? index === 0 : currentPath === link.href
+
+                return (
+                  <a
+                    className={`text-heading-lg rounded-[var(--radius-xl)] px-5 py-4 font-semibold transition-colors ${
+                      isActive
+                        ? '-mx-[var(--container-padding)] rounded-none bg-[var(--color-primary)] px-[calc(var(--container-padding)+var(--space-5))] text-white'
+                        : 'text-[var(--color-text)] active:bg-[var(--color-primary-50)]'
+                    }`}
+                    href={link.href}
+                    key={link.label}
+                    onClick={closeMenu}
+                  >
+                    {link.label}
+                  </a>
+                )
+              })}
             </div>
 
             {isPublic ? (
