@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { HomePage } from '../features/home/pages/HomePage'
 import { Footer } from '../features/home/components/Footer'
 import { Navbar } from '../features/home/components/Navbar'
+import { DashboardPage } from '../features/dashboard/pages/DashboardPage'
 import { LoadingPage, NotFoundPage } from '../shared/components'
 import { NAVIGATION_EVENT } from '../shared/utils/navigation'
 import { RegisterPage } from '../features/auth/pages/RegisterPage'
@@ -91,7 +92,7 @@ function App() {
   }
 
   if (path === '/dashboard') {
-    return <AppPlaceholder title="Dashboard" />
+    return <DashboardPage />
   }
 
   if (path === '/auth/reset-password') {
