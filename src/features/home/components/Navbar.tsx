@@ -10,8 +10,17 @@ type NavbarProps = {
   variant?: NavbarVariant
 }
 
-const publicLinks = ['Fitur', 'Cara Kerja', 'Harga', 'FAQ']
-const appLinks = ['Dashboard', 'Analisis Baru', 'Riwayat']
+const publicLinks = [
+  { href: '#fitur', label: 'Fitur' },
+  { href: '#cara-kerja', label: 'Cara Kerja' },
+  { href: '#harga', label: 'Harga' },
+  { href: '#faq', label: 'FAQ' },
+]
+const appLinks = [
+  { href: '/dashboard', label: 'Dashboard' },
+  { href: '/analysis/new', label: 'Analisis Baru' },
+  { href: '/history', label: 'Riwayat' },
+]
 
 export function Navbar({ variant = 'public' }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -42,10 +51,10 @@ export function Navbar({ variant = 'public' }: NavbarProps) {
             {links.map((link, index) => (
               <a
                 className="group/link flex flex-col items-center gap-2 text-label-md font-semibold text-[var(--color-text)] transition-colors hover:text-[var(--color-primary)]"
-                href="#"
-                key={link}
+                href={link.href}
+                key={link.label}
               >
-                <span>{link}</span>
+                <span>{link.label}</span>
                 <span
                   className={`h-0.5 w-10 origin-center rounded-full bg-[var(--color-primary)] transition-transform duration-200 ease-out group-hover/link:!scale-x-100 ${
                     index === 0 ? 'scale-x-100 group-hover/nav:scale-x-0' : 'scale-x-0'
@@ -57,8 +66,12 @@ export function Navbar({ variant = 'public' }: NavbarProps) {
 
           {isPublic ? (
             <div className="z-10 hidden items-center gap-6 lg:flex">
-              <Button variant="text">Masuk</Button>
-              <Button icon="lucide:arrow-right">Mulai Gratis</Button>
+              <Button onClick={() => (window.location.href = '/auth/login')} variant="text">
+                Masuk
+              </Button>
+              <Button icon="lucide:arrow-right" onClick={() => (window.location.href = '/auth/register')}>
+                Mulai Gratis
+              </Button>
             </div>
           ) : (
             <div className="z-10 hidden items-center gap-3 border-l border-[var(--color-border)] pl-6 lg:flex">
@@ -117,21 +130,21 @@ export function Navbar({ variant = 'public' }: NavbarProps) {
                       ? '-mx-[var(--container-padding)] rounded-none bg-[var(--color-primary)] px-[calc(var(--container-padding)+var(--space-5))] text-white'
                       : 'text-[var(--color-text)] active:bg-[var(--color-primary-50)]'
                   }`}
-                  href="#"
-                  key={link}
+                  href={link.href}
+                  key={link.label}
                   onClick={closeMenu}
                 >
-                  {link}
+                  {link.label}
                 </a>
               ))}
             </div>
 
             {isPublic ? (
               <div className="grid gap-3">
-                <Button className="w-full" onClick={closeMenu} variant="text">
+                <Button className="w-full" onClick={() => (window.location.href = '/auth/login')} variant="text">
                   Masuk
                 </Button>
-                <Button className="w-full" icon="lucide:arrow-right" onClick={closeMenu}>
+                <Button className="w-full" icon="lucide:arrow-right" onClick={() => (window.location.href = '/auth/register')}>
                   Mulai Gratis
                 </Button>
               </div>

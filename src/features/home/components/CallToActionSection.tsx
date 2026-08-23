@@ -1,10 +1,16 @@
 import { Icon } from '@iconify/react'
+import type { FormEvent } from 'react'
 import { useStaggerInView } from '../../../shared/hooks/useStaggerInView'
 
 const notes = ['Gratis 10 kredit pertama', 'Tanpa kartu kredit', 'Setup 2 menit']
 
 export function CallToActionSection() {
   const { ref, isVisible } = useStaggerInView<HTMLElement>()
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    window.location.href = '/auth/register'
+  }
 
   return (
     <section
@@ -23,7 +29,7 @@ export function CallToActionSection() {
 
         <form
           className="animate-stagger-rise mx-auto mt-9 flex max-w-[580px] flex-col gap-3 rounded-[var(--radius-lg)] bg-[var(--color-neutral-900)] p-2 [--stagger-index:2] sm:h-16 sm:flex-row sm:rounded-[var(--radius-full)]"
-          onSubmit={(event) => event.preventDefault()}
+          onSubmit={handleSubmit}
         >
           <label className="sr-only" htmlFor="cta-email">
             Alamat email

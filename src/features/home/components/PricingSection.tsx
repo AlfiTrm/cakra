@@ -35,6 +35,7 @@ export function PricingSection() {
 
   return (
     <section
+      id="harga"
       ref={ref}
       className={`bg-[var(--color-neutral-900)] py-20 md:py-24 ${isVisible ? 'is-stagger-visible' : ''}`}
     >
@@ -104,6 +105,7 @@ export function PricingSection() {
                       ? 'bg-white text-[var(--color-primary)] hover:bg-[var(--color-primary-50)]'
                       : 'bg-[var(--color-neutral-900)] text-white hover:bg-[var(--color-primary)]'
                   }`}
+                  onClick={() => (window.location.href = '/auth/register')}
                   type="button"
                 >
                   {plan.cta}

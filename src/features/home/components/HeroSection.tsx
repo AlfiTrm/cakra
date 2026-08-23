@@ -18,8 +18,12 @@ export function HeroSection() {
         </p>
 
         <div className="animate-stagger-rise mt-9 flex flex-col items-center gap-3 [--stagger-index:2] sm:flex-row">
-          <Button icon="lucide:arrow-right">Mulai Sekarang</Button>
-          <Button variant="outline">Konsultasi Ahli</Button>
+          <Button icon="lucide:arrow-right" onClick={() => (window.location.href = '/auth/register')}>
+            Mulai Sekarang
+          </Button>
+          <Button onClick={() => (window.location.href = 'mailto:hello@cakra.ai')} variant="outline">
+            Konsultasi Ahli
+          </Button>
         </div>
 
         <div className="animate-stagger-rise mt-14 [--stagger-index:3]">
