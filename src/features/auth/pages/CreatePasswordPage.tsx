@@ -1,12 +1,44 @@
+import { useState } from 'react'
 import logoPrimary from '../../../assets/brand/logo-primary-default.svg'
-import { AuthDecorPanel, AuthInput } from '../components'
+import { AuthDecorPanel, AuthInput, AuthSubmitButton } from '../components'
 import type { FormEvent } from 'react'
 import { navigateTo } from '../../../shared/utils/navigation'
+import { clearRegisterSessionToken, getRegisterSessionToken, setAccessToken } from '../services/authStorage'
+import { confirmRegisterPassword } from '../services/authService'
 
 export function CreatePasswordPage() {
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [password, setPassword] = useState('')
+  const canSubmit = password.length >= 8 && confirmPassword.length >= 8 && password === confirmPassword
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    navigateTo('/auth/login')
+    const sessionToken = getRegisterSessionToken()
+    if (!sessionToken) {
+      navigateTo('/auth/register')
+      return
+    }
+
+    if (password !== confirmPassword) {
+      setError('Konfirmasi password belum sama.')
+      return
+    }
+
+    setError('')
+    setIsSubmitting(true)
+
+    try {
+      const response = await confirmRegisterPassword(sessionToken, password, confirmPassword)
+      setAccessToken(response.data.access_token)
+      clearRegisterSessionToken()
+      navigateTo('/dashboard')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Gagal mengaktifkan akun.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -30,15 +62,30 @@ export function CreatePasswordPage() {
               </p>
 
               <form className="mt-8 grid gap-4" onSubmit={handleSubmit}>
-                <AuthInput label="Masukkan password" placeholder="Masukkan password" type="password" />
-                <AuthInput label="Konfirmasi password anda" placeholder="Konfirmasi password anda" type="password" />
+                <AuthInput
+                  label="Masukkan password"
+                  minLength={8}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="Masukkan password"
+                  required
+                  type="password"
+                  value={password}
+                />
+                <AuthInput
+                  label="Konfirmasi password anda"
+                  minLength={8}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  placeholder="Konfirmasi password anda"
+                  required
+                  type="password"
+                  value={confirmPassword}
+                />
 
-                <button
-                  className="mt-3 h-12 rounded-[var(--radius-lg)] bg-[var(--color-primary)] px-6 text-label-md font-bold text-white shadow-lg shadow-[rgb(45_82_221_/_0.22)] transition-colors hover:bg-[var(--color-primary-hover)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-primary-200)]"
-                  type="submit"
-                >
+                {error ? <p className="text-body-sm font-semibold text-[var(--color-danger)]">{error}</p> : null}
+
+                <AuthSubmitButton className="mt-3" disabled={!canSubmit} isLoading={isSubmitting}>
                   Aktifkan akun
-                </button>
+                </AuthSubmitButton>
               </form>
             </div>
           </div>

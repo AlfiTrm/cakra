@@ -1,12 +1,36 @@
+import { useState } from 'react'
 import logoPrimary from '../../../assets/brand/logo-primary-default.svg'
-import { AuthDecorPanel, AuthInput } from '../components'
+import { AuthDecorPanel, AuthInput, AuthSubmitButton } from '../components'
 import type { FormEvent } from 'react'
 import { navigateTo } from '../../../shared/utils/navigation'
+import { forgotPassword } from '../services/authService'
+import { setResetSessionToken } from '../services/authStorage'
 
 export function ForgotPasswordPage() {
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const [email, setEmail] = useState('')
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const canSubmit = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) && !email.toLowerCase().endsWith('.con')
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    navigateTo('/auth/forgot-password/otp')
+    setError('')
+    setIsSubmitting(true)
+
+    try {
+      const response = await forgotPassword({ email })
+      if (!response.sessionToken) {
+        setError('Session reset tidak ditemukan dari server.')
+        return
+      }
+
+      setResetSessionToken(response.sessionToken)
+      navigateTo('/auth/forgot-password/otp')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Gagal mengirim kode OTP.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -31,14 +55,20 @@ export function ForgotPasswordPage() {
               </p>
 
               <form className="mt-8 grid gap-4" onSubmit={handleSubmit}>
-                <AuthInput label="Alamat Email Akun" placeholder="nama@toko.com" type="email" />
+                <AuthInput
+                  label="Alamat Email Akun"
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="nama@toko.com"
+                  required
+                  type="email"
+                  value={email}
+                />
 
-                <button
-                  className="mt-3 h-12 rounded-[var(--radius-lg)] bg-[var(--color-primary)] px-6 text-label-md font-bold text-white shadow-lg shadow-[rgb(45_82_221_/_0.22)] transition-colors hover:bg-[var(--color-primary-hover)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-primary-200)]"
-                  type="submit"
-                >
+                {error ? <p className="text-body-sm font-semibold text-[var(--color-danger)]">{error}</p> : null}
+
+                <AuthSubmitButton className="mt-3" disabled={!canSubmit} isLoading={isSubmitting}>
                   Kirim Kode OTP
-                </button>
+                </AuthSubmitButton>
               </form>
             </div>
           </div>

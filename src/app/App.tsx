@@ -13,6 +13,7 @@ import { ForgotPasswordPage } from '../features/auth/pages/ForgotPasswordPage'
 import { ForgotPasswordOtpPage } from '../features/auth/pages/ForgotPasswordOtpPage'
 import { LoginPage } from '../features/auth/pages/LoginPage'
 import { ResetPasswordPage } from '../features/auth/pages/ResetPasswordPage'
+import { AUTH_LOGOUT_EVENT, isAuthenticated } from '../shared/services/authToken'
 
 function App() {
   const [isLoading, setIsLoading] = useState(false)
@@ -45,6 +46,10 @@ function App() {
       }, 180)
     }
 
+    function handleAuthLogout() {
+      openPath('/auth/login', true)
+    }
+
     function handleClick(event: MouseEvent) {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
         return
@@ -61,12 +66,14 @@ function App() {
     }
 
     window.addEventListener(NAVIGATION_EVENT, handleNavigate)
+    window.addEventListener(AUTH_LOGOUT_EVENT, handleAuthLogout)
     window.addEventListener('popstate', handlePopState)
     document.addEventListener('click', handleClick)
 
     return () => {
       window.clearTimeout(timeoutId)
       window.removeEventListener(NAVIGATION_EVENT, handleNavigate)
+      window.removeEventListener(AUTH_LOGOUT_EVENT, handleAuthLogout)
       window.removeEventListener('popstate', handlePopState)
       document.removeEventListener('click', handleClick)
     }
@@ -74,6 +81,10 @@ function App() {
 
   if (isLoading) {
     return <LoadingPage />
+  }
+
+  if (isProtectedPath(path) && !isAuthenticated()) {
+    return <LoginPage />
   }
 
   if (path === '/privacy') {
@@ -132,7 +143,7 @@ function App() {
 }
 
 function NotFoundRoute({ path }: { path: string }) {
-  const isAppRoute = ['/dashboard', '/analysis', '/history', '/settings'].some((appPath) => path.startsWith(appPath))
+  const isAppRoute = isProtectedPath(path)
 
   return (
     <>
@@ -141,6 +152,10 @@ function NotFoundRoute({ path }: { path: string }) {
       {isAppRoute ? null : <Footer />}
     </>
   )
+}
+
+function isProtectedPath(path: string) {
+  return ['/dashboard', '/analysis', '/history', '/settings'].some((appPath) => path.startsWith(appPath))
 }
 
 function AppPlaceholder({ title }: { title: string }) {
