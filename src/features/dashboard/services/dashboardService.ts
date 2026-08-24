@@ -55,15 +55,30 @@ type DashboardUrgentSku = {
   sku_name: string
 }
 
+const dashboardCache = new Map<string, DashboardViewModel>()
+
+export function getCachedDashboard(search = '') {
+  return dashboardCache.get(buildDashboardCacheKey(search)) ?? null
+}
+
 export async function getDashboard(search = '', signal?: AbortSignal): Promise<DashboardViewModel> {
   const query = search.trim() ? `?search=${encodeURIComponent(search.trim())}` : ''
-  const dashboardResponse = await http<ApiResponse<DashboardResponse>>(`/analysis/dashboard${query}`, { signal })
-  const creditResponse = await http<ApiResponse<CreditAccountResponse>>('/analysis/credit-account', { signal }).catch(() => null)
+  const [dashboardResponse, creditResponse] = await Promise.all([
+    http<ApiResponse<DashboardResponse>>(`/analysis/dashboard${query}`, { signal }),
+    http<ApiResponse<CreditAccountResponse>>('/analysis/credit-account', { signal }).catch(() => null),
+  ])
   const creditAccount = creditResponse?.data ?? dashboardResponse.data.credit_account
 
   setStoredUserName(dashboardResponse.data.user_name)
 
-  return mapDashboard(dashboardResponse.data, creditAccount)
+  const dashboard = mapDashboard(dashboardResponse.data, creditAccount)
+  dashboardCache.set(buildDashboardCacheKey(search), dashboard)
+
+  return dashboard
+}
+
+function buildDashboardCacheKey(search: string) {
+  return search.trim().toLowerCase()
 }
 
 function mapDashboard(data: DashboardResponse, creditAccount: CreditAccountResponse): DashboardViewModel {

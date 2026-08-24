@@ -2,6 +2,13 @@ function SkeletonBlock({ className = '' }: { className?: string }) {
   return <div className={`animate-pulse rounded-[var(--radius-lg)] bg-[var(--color-neutral-100)] ${className}`.trim()} />
 }
 
+const statSkeletons = [
+  'border-[var(--color-primary-200)] bg-[var(--color-primary-50)]',
+  'border-[var(--color-success-200)] bg-[var(--color-success-50)]',
+  'border-[var(--color-danger-200)] bg-[var(--color-danger-50)]',
+  'border-[var(--color-primary-100)] bg-[#f5f2ff]',
+]
+
 export function DashboardSkeleton() {
   return (
     <div aria-label="Memuat dashboard" aria-live="polite" className="app-container py-10 md:py-12" role="status">
@@ -15,12 +22,11 @@ export function DashboardSkeleton() {
       </div>
 
       <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-        {Array.from({ length: 4 }, (_, index) => (
-          <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white p-6 shadow-sm" key={index}>
-            <SkeletonBlock className="h-4 w-36" />
-            <SkeletonBlock className="mt-6 h-10 w-32" />
-            <SkeletonBlock className="mt-4 h-4 w-40" />
-            <SkeletonBlock className="mt-2 h-4 w-28" />
+        {statSkeletons.map((toneClass) => (
+          <div className={`min-h-[157px] rounded-[var(--radius-lg)] border p-6 shadow-sm ${toneClass}`} key={toneClass}>
+            <SkeletonBlock className="h-4 w-36 bg-white/70" />
+            <SkeletonBlock className="mt-4 h-10 w-32 bg-white/70" />
+            <SkeletonBlock className="mt-2 h-5 w-40 bg-white/70" />
           </div>
         ))}
       </div>

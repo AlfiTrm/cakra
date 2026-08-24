@@ -34,6 +34,24 @@
   }
 }
 
+@keyframes dashboard-tip-swipe {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  42% {
+    opacity: 1;
+    transform: translate3d(0, -1px, 0);
+  }
+  62% {
+    transform: translate3d(0, 2px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 .animate-stagger-rise {
   opacity: 0;
   transform: translate3d(0, 18px, 0);
@@ -54,9 +72,14 @@
   animation-delay: calc(var(--stagger-index, 0) * var(--stagger-gap, 90ms));
 }
 
+.animate-dashboard-tip-swipe {
+  animation: dashboard-tip-swipe 520ms both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-stagger-rise,
-  .animate-stagger-scale {
+  .animate-stagger-scale,
+  .animate-dashboard-tip-swipe {
     animation: none;
     opacity: 1;
     transform: none;

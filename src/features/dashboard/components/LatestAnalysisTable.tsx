@@ -1,5 +1,6 @@
 import type { LatestAnalysis } from '../types/dashboard'
-import { AnalysisTable, SearchInput } from '../../../shared/components'
+import { AnalysisTable } from '../../../shared/components/AnalysisTable'
+import { SearchInput } from '../../../shared/components/Input'
 import { navigateTo } from '../../../shared/utils/navigation'
 
 type LatestAnalysisTableProps = {

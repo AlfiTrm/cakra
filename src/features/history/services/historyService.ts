@@ -45,19 +45,35 @@ type HistoryItemResponse = {
   sku_name: string
 }
 
+const categoriesCacheKey = 'categories'
+const categoriesCache = new Map<string, HistoryCategory[]>()
+const historyCache = new Map<string, HistoryViewModel>()
+
+export function getCachedCategories() {
+  return categoriesCache.get(categoriesCacheKey) ?? []
+}
+
+export function getCachedHistory(filters: HistoryFilters) {
+  return historyCache.get(buildHistoryQuery(filters)) ?? null
+}
+
 export async function getCategories(signal?: AbortSignal): Promise<HistoryCategory[]> {
   const response = await http<ApiResponse<CategoryResponse[]>>('/analysis/categories', { signal })
 
-  return response.data.map((category) => ({
+  const categories = response.data.map((category) => ({
     id: category.category_id,
     name: category.name,
   }))
+
+  categoriesCache.set(categoriesCacheKey, categories)
+
+  return categories
 }
 
 export async function getHistory(filters: HistoryFilters, signal?: AbortSignal): Promise<HistoryViewModel> {
   const historyResponse = await http<ApiResponse<HistoryResponse>>(`/analysis/history?${buildHistoryQuery(filters)}`, { signal })
 
-  return {
+  const history = {
     items: historyResponse.data.items.map((item) => ({
       category: item.category ?? '-',
       date: formatDate(item.analysis_date),
@@ -71,6 +87,10 @@ export async function getHistory(filters: HistoryFilters, signal?: AbortSignal):
     pagination: mapPagination(historyResponse.data.pagination),
     stats: mapStats(historyResponse.data.summary),
   }
+
+  historyCache.set(buildHistoryQuery(filters), history)
+
+  return history
 }
 
 function buildHistoryQuery(filters: HistoryFilters) {
