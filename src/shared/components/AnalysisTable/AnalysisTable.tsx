@@ -1,5 +1,3 @@
-import { Icon } from '@iconify/react'
-
 export type AnalysisRiskStatus = 'Hampir Habis' | 'Normal' | 'Stok Mati'
 
 export type AnalysisTableRow = {
@@ -94,7 +92,7 @@ export function AnalysisTable({
                         onClick={() => onView?.(analysis)}
                         type="button"
                       >
-                        <Icon className="size-4" icon="lucide:eye" />
+                        <EyeIcon />
                       </button>
                       <button
                         aria-label={`Unduh analisis ${analysis.skuName}`}
@@ -103,7 +101,7 @@ export function AnalysisTable({
                         onClick={() => onDownload?.(analysis)}
                         type="button"
                       >
-                        <Icon className="size-4" icon="lucide:download" />
+                        <DownloadIcon />
                       </button>
                     </div>
                   </td>
@@ -114,5 +112,22 @@ export function AnalysisTable({
         </tbody>
       </table>
     </div>
+  )
+}
+
+function EyeIcon() {
+  return (
+    <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+      <path d="M2.1 12s3.6-6.5 9.9-6.5S21.9 12 21.9 12s-3.6 6.5-9.9 6.5S2.1 12 2.1 12Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+      <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+    </svg>
+  )
+}
+
+function DownloadIcon() {
+  return (
+    <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+      <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+    </svg>
   )
 }

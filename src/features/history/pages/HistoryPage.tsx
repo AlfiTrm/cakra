@@ -6,7 +6,7 @@ import { navigateTo } from '../../../shared/utils/navigation'
 import { DashboardStats } from '../../dashboard/components'
 import { Navbar } from '../../home/components/Navbar'
 import { HistoryFilterBar, HistoryPagination } from '../components'
-import { getCategories, getHistory } from '../services/historyService'
+import { getCachedCategories, getCachedHistory, getCategories, getHistory } from '../services/historyService'
 import type { HistoryCategory, HistoryFilters, HistoryViewModel } from '../types/history'
 
 const initialFilters: HistoryFilters = {
@@ -18,11 +18,11 @@ const initialFilters: HistoryFilters = {
 }
 
 export function HistoryPage() {
-  const [categories, setCategories] = useState<HistoryCategory[]>([])
+  const [categories, setCategories] = useState<HistoryCategory[]>(() => getCachedCategories())
   const [filters, setFilters] = useState(initialFilters)
-  const [history, setHistory] = useState<HistoryViewModel | null>(null)
+  const [history, setHistory] = useState<HistoryViewModel | null>(() => getCachedHistory(initialFilters))
   const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(() => !getCachedHistory(initialFilters))
 
   async function loadHistory(nextFilters: HistoryFilters, signal?: AbortSignal) {
     setError('')
@@ -56,6 +56,9 @@ export function HistoryPage() {
 
   useEffect(() => {
     const controller = new AbortController()
+    const cachedHistory = getCachedHistory(filters)
+    if (cachedHistory) setHistory(cachedHistory)
+
     const timeoutId = window.setTimeout(() => {
       void loadHistory(filters, controller.signal)
     }, 300)
@@ -107,7 +110,7 @@ export function HistoryPage() {
           </header>
 
           <div className="mt-8">
-            <DashboardStats columns={3} stats={history?.stats ?? []} />
+            {isLoading && !history ? <HistoryStatsSkeleton /> : <DashboardStats columns={3} stats={history?.stats ?? []} />}
           </div>
 
           {error ? (
@@ -148,5 +151,25 @@ export function HistoryPage() {
         </section>
       </main>
     </>
+  )
+}
+
+const historyStatSkeletons = [
+  'border-[var(--color-primary-200)] bg-[var(--color-primary-50)]',
+  'border-[var(--color-primary-100)] bg-[#f5f2ff]',
+  'border-[var(--color-danger-200)] bg-[var(--color-danger-50)]',
+]
+
+function HistoryStatsSkeleton() {
+  return (
+    <section aria-label="Memuat ringkasan riwayat" className="grid gap-5 md:grid-cols-2 xl:grid-cols-3" role="status">
+      {historyStatSkeletons.map((toneClass) => (
+        <div className={`min-h-[157px] rounded-[var(--radius-lg)] border p-6 shadow-sm ${toneClass}`} key={toneClass}>
+          <div className="h-4 w-36 animate-pulse rounded-[var(--radius-lg)] bg-white/70" />
+          <div className="mt-4 h-10 w-32 animate-pulse rounded-[var(--radius-lg)] bg-white/70" />
+          <div className="mt-2 h-5 w-44 animate-pulse rounded-[var(--radius-lg)] bg-white/70" />
+        </div>
+      ))}
+    </section>
   )
 }

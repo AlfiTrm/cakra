@@ -17,7 +17,7 @@ export function DashboardStats({ columns = 4, stats }: DashboardStatsProps) {
     <section className={`grid gap-5 md:grid-cols-2 ${columns === 3 ? 'xl:grid-cols-3' : 'xl:grid-cols-4'}`}>
       {stats.map((stat) => (
         <article
-          className={`rounded-[var(--radius-lg)] border p-6 shadow-sm ${toneClass[stat.tone]}`}
+          className={`min-h-[157px] rounded-[var(--radius-lg)] border p-6 shadow-sm ${toneClass[stat.tone]}`}
           key={stat.label}
         >
           <p className="text-label-sm font-bold uppercase tracking-[0.04em] text-[var(--color-text-muted)]">

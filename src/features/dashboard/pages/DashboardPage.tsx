@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react'
 import { Navbar } from '../../home/components/Navbar'
 import { AttentionSkuCard, CreditUsageCard, DashboardHeader, DashboardSkeleton, DashboardStats, LatestAnalysisTable } from '../components'
-import { getDashboard } from '../services/dashboardService'
+import { getCachedDashboard, getDashboard } from '../services/dashboardService'
 import type { DashboardViewModel } from '../types/dashboard'
 
 export function DashboardPage() {
-  const [dashboard, setDashboard] = useState<DashboardViewModel | null>(null)
+  const [dashboard, setDashboard] = useState<DashboardViewModel | null>(() => getCachedDashboard())
   const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(() => !getCachedDashboard())
   const [search, setSearch] = useState('')
 
   useEffect(() => {
     const controller = new AbortController()
+    const cachedDashboard = getCachedDashboard(search)
+    if (cachedDashboard) setDashboard(cachedDashboard)
+
     const timeoutId = window.setTimeout(() => {
       void loadDashboard(search, controller.signal)
     }, 300)
