@@ -3,6 +3,7 @@ import { getAccessToken, logout } from './authToken'
 
 type RequestOptions = Omit<RequestInit, 'body'> & {
   body?: BodyInit | Record<string, unknown>
+  skipAuth?: boolean
   timeoutMs?: number
 }
 
@@ -33,12 +34,12 @@ export async function httpWithResponse<T>(path: string, options: RequestOptions 
     throw new Error('VITE_BASE_API belum diset.')
   }
 
-  const { timeoutMs = 30_000, ...requestOptions } = options
+  const { skipAuth = false, timeoutMs = 30_000, ...requestOptions } = options
   const controller = new AbortController()
   const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs)
   const body = serializeBody(options.body)
   const isJson = typeof body === 'string' && typeof options.body !== 'string'
-  const token = getAccessToken()
+  const token = skipAuth ? null : getAccessToken()
 
   try {
     let response: Response
@@ -67,7 +68,7 @@ export async function httpWithResponse<T>(path: string, options: RequestOptions 
     const data = await parseResponse(response)
 
     if (!response.ok) {
-      if (response.status === 401) {
+      if (response.status === 401 && token) {
         logout()
       }
 

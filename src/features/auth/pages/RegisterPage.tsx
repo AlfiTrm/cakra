@@ -1,6 +1,5 @@
-import { Icon } from '@iconify/react'
 import { useState } from 'react'
-import logoPrimary from '../../../assets/brand/logo-primary-default.svg'
+import logoSecondary from '../../../assets/brand/logo-secondary-default.svg'
 import { AuthDecorPanel, AuthInput, AuthSubmitButton } from '../components'
 import type { FormEvent } from 'react'
 import { navigateTo } from '../../../shared/utils/navigation'
@@ -44,7 +43,7 @@ export function RegisterPage() {
         <section className="flex h-full flex-col px-7 py-7 sm:px-12 lg:px-16">
           <header className="flex items-center justify-between">
             <a aria-label="Cakra home" href="/">
-              <img alt="Cakra" className="h-8 w-auto" src={logoPrimary} />
+              <img alt="Cakra" className="h-8 w-auto" src={logoSecondary} />
             </a>
             <p className="text-label-sm text-[var(--color-text-muted)]">
               Sudah punya akun?{' '}
@@ -54,7 +53,7 @@ export function RegisterPage() {
             </p>
           </header>
 
-          <div className="flex flex-1 items-center py-8">
+          <div className="flex flex-1 items-center justify-center py-8">
             <div className="w-full max-w-[480px]">
               <h1 className="text-display-sm text-[var(--color-text)]">Buat Akun Baru</h1>
               <p className="mt-3 text-body-md text-[var(--color-text-muted)]">
@@ -62,13 +61,10 @@ export function RegisterPage() {
               </p>
 
               <button
-                className="mt-7 flex h-12 w-full items-center justify-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white px-5 text-label-md font-bold text-[var(--color-text)] transition-colors hover:border-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-primary-200)]"
-                onClick={() => navigateTo('/auth/register/otp')}
+                className="mt-7 flex h-12 w-full cursor-not-allowed items-center justify-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-neutral-50)] px-5 text-label-md font-bold text-[var(--color-text-muted)] opacity-70"
+                disabled
                 type="button"
               >
-                <span className="grid size-4 shrink-0 place-items-center">
-                  <Icon aria-hidden="true" className="size-4" icon="logos:google-icon" />
-                </span>
                 Daftar dengan Google
               </button>
 

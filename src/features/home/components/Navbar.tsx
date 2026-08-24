@@ -3,35 +3,24 @@ import { useState } from 'react'
 import logoPrimary from '../../../assets/brand/logo-primary-default.svg'
 import logoSecondary from '../../../assets/brand/logo-secondary-default.svg'
 import { Button } from '../../../shared/components'
-import { getStoredUserName } from '../../../shared/services/authToken'
+import { logout, getStoredUserName } from '../../../shared/services/authToken'
 import { navigateTo } from '../../../shared/utils/navigation'
+import { logoutSession } from '../../auth/services/authService'
+import { appLinks, publicLinks } from '../data/navbarLinks'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
+import type { NavbarProps } from '../types/navbar'
+import { ProfileDropdown } from './ProfileDropdown'
 
-type NavbarVariant = 'public' | 'app'
-
-type NavbarProps = {
-  userName?: string
-  variant?: NavbarVariant
-}
-
-const publicLinks = [
-  { href: '#fitur', label: 'Fitur' },
-  { href: '#cara-kerja', label: 'Cara Kerja' },
-  { href: '#harga', label: 'Harga' },
-  { href: '#faq', label: 'FAQ' },
-]
-const appLinks = [
-  { href: '/dashboard', label: 'Dashboard' },
-  { href: '/analysis/new', label: 'Analisis Baru' },
-  { href: '/history', label: 'Riwayat' },
-]
-
-export function Navbar({ userName, variant = 'public' }: NavbarProps) {
+export function Navbar({ availableCredits = 18, totalCredits = 50, userName, variant = 'public' }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isMenuVisible, setIsMenuVisible] = useState(false)
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
   const isPublic = variant === 'public'
   const links = isPublic ? publicLinks : appLinks
   const currentPath = window.location.pathname
   const displayName = userName ?? getStoredUserName() ?? 'Pengguna'
+  const creditPercent = Math.max(0, Math.min(Math.round((availableCredits / Math.max(totalCredits, 1)) * 100), 100))
+  useBodyScrollLock(isProfileOpen || isMenuOpen)
 
   function openMenu() {
     setIsMenuOpen(true)
@@ -41,6 +30,15 @@ export function Navbar({ userName, variant = 'public' }: NavbarProps) {
   function closeMenu() {
     setIsMenuVisible(false)
     window.setTimeout(() => setIsMenuOpen(false), 180)
+  }
+
+  async function handleLogout() {
+    try {
+      await logoutSession()
+    } finally {
+      setIsProfileOpen(false)
+      logout()
+    }
   }
 
   return (
@@ -83,7 +81,14 @@ export function Navbar({ userName, variant = 'public' }: NavbarProps) {
               </Button>
             </div>
           ) : (
-            <div className="z-10 hidden items-center gap-3 border-l border-[var(--color-border)] pl-6 lg:flex">
+            <button
+              aria-expanded={isProfileOpen}
+              className={`hidden items-center gap-3 rounded-[var(--radius-lg)] border border-transparent py-2 pl-3 pr-4 text-left transition-colors hover:border-[var(--color-border)] hover:bg-white lg:flex ${
+                isProfileOpen ? 'z-[70] bg-white' : 'z-10'
+              }`}
+              onClick={() => setIsProfileOpen((current) => !current)}
+              type="button"
+            >
               <div className="grid size-10 place-items-center rounded-full bg-[var(--color-primary-100)] text-label-md text-[var(--color-primary)]">
                 {displayName.charAt(0).toUpperCase()}
               </div>
@@ -91,7 +96,7 @@ export function Navbar({ userName, variant = 'public' }: NavbarProps) {
                 <p className="text-label-md text-[var(--color-text)]">{displayName}</p>
                 <p className="text-body-xs text-[var(--color-text-muted)]">Premium Member</p>
               </div>
-            </div>
+            </button>
           )}
 
           <button
@@ -107,6 +112,37 @@ export function Navbar({ userName, variant = 'public' }: NavbarProps) {
       </header>
 
       <div className="h-[72px]" />
+
+      {!isPublic && isProfileOpen ? (
+        <>
+          <div className="pointer-events-none fixed inset-x-0 top-0 z-[70] hidden lg:block">
+            <div className="app-container flex h-[72px] items-center justify-end">
+              <button
+                aria-expanded="true"
+                className="pointer-events-auto flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white py-2 pl-3 pr-4 text-left"
+                onClick={() => setIsProfileOpen(false)}
+                type="button"
+              >
+                <div className="grid size-10 place-items-center rounded-full bg-[var(--color-primary-100)] text-label-md text-[var(--color-primary)]">
+                  {displayName.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-label-md text-[var(--color-text)]">{displayName}</p>
+                  <p className="text-body-xs text-[var(--color-text-muted)]">Premium Member</p>
+                </div>
+              </button>
+            </div>
+          </div>
+          <ProfileDropdown
+            availableCredits={availableCredits}
+            creditPercent={creditPercent}
+            displayName={displayName}
+            totalCredits={totalCredits}
+            onClose={() => setIsProfileOpen(false)}
+            onLogout={handleLogout}
+          />
+        </>
+      ) : null}
 
       {isMenuOpen ? (
         <div
