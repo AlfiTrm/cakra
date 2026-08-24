@@ -1,9 +1,89 @@
+import { useEffect, useState } from 'react'
 import { AnalysisTable, SearchInput } from '../../../shared/components'
+import type { AnalysisTableRow } from '../../../shared/components'
+import { LoadingContent } from '../../../shared/components/feedback'
+import { navigateTo } from '../../../shared/utils/navigation'
 import { DashboardStats } from '../../dashboard/components'
 import { Navbar } from '../../home/components/Navbar'
-import { historyAnalyses, historyStats } from '../data/historyData'
+import { HistoryFilterBar, HistoryPagination } from '../components'
+import { getCategories, getHistory } from '../services/historyService'
+import type { HistoryCategory, HistoryFilters, HistoryViewModel } from '../types/history'
+
+const initialFilters: HistoryFilters = {
+  category: '',
+  page: 1,
+  riskLabel: '',
+  search: '',
+  sort: 'newest',
+}
 
 export function HistoryPage() {
+  const [categories, setCategories] = useState<HistoryCategory[]>([])
+  const [filters, setFilters] = useState(initialFilters)
+  const [history, setHistory] = useState<HistoryViewModel | null>(null)
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
+
+  async function loadHistory(nextFilters: HistoryFilters, signal?: AbortSignal) {
+    setError('')
+    setIsLoading(true)
+
+    try {
+      setHistory(await getHistory(nextFilters, signal))
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return
+      setError(err instanceof Error ? err.message : 'Riwayat gagal dimuat.')
+    } finally {
+      if (!signal?.aborted) setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    async function loadCategories() {
+      try {
+        setCategories(await getCategories(controller.signal))
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return
+      }
+    }
+
+    void loadCategories()
+
+    return () => controller.abort()
+  }, [])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    const timeoutId = window.setTimeout(() => {
+      void loadHistory(filters, controller.signal)
+    }, 300)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+      controller.abort()
+    }
+  }, [filters])
+
+  function handleDownload(row: AnalysisTableRow) {
+    const csv = [
+      ['Nama SKU', 'ID SKU', 'Kategori', 'Status Risiko', 'ROP', 'ROQ', 'Tanggal Analisis'],
+      [row.skuName, row.id, row.category, row.status, row.rop, row.roq, row.date],
+    ]
+      .map((line) => line.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(','))
+      .join('\n')
+
+    const url = URL.createObjectURL(new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' }))
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `analisis-${row.sessionId ?? row.id}.csv`
+    document.body.append(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <>
       <Navbar variant="app" />
@@ -16,59 +96,57 @@ export function HistoryPage() {
                 Lihat dan kelola hasil analisis SKU yang telah dilakukan.
               </p>
             </div>
-            <SearchInput aria-label="Cari SKU" className="w-full md:w-[260px]" placeholder="Cari SKU..." />
+            <SearchInput
+              aria-label="Cari SKU"
+              className="w-full md:w-[260px]"
+              isLoading={isLoading && Boolean(history)}
+              onChange={(event) => setFilters((current) => ({ ...current, page: 1, search: event.target.value }))}
+              placeholder="Cari SKU..."
+              value={filters.search}
+            />
           </header>
 
           <div className="mt-8">
-            <DashboardStats columns={3} stats={historyStats} />
+            <DashboardStats columns={3} stats={history?.stats ?? []} />
           </div>
 
-          <section className="mt-8">
-            <div className="flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white px-5 py-4 shadow-sm md:flex-row md:items-center md:justify-between">
-              <div className="flex flex-wrap gap-3">
-                <FilterChip>Status: Semua Status</FilterChip>
-                <FilterChip>Kategori: Semua Kategori</FilterChip>
-              </div>
-              <div className="flex items-center justify-between gap-5">
-                <FilterChip>Urutkan: Terbaru</FilterChip>
-                <span className="text-label-sm font-bold text-[var(--color-primary)]">32 Analisis</span>
-              </div>
+          {error ? (
+            <div className="mt-6 rounded-[var(--radius-lg)] border border-[var(--color-danger-200)] bg-[var(--color-danger-50)] px-5 py-4 text-body-sm font-semibold text-[var(--color-danger)]">
+              {error}
             </div>
+          ) : null}
+
+          <section className="mt-8">
+            <HistoryFilterBar
+              categories={categories}
+              filters={filters}
+              totalItems={history?.pagination.totalItems ?? 0}
+              onChange={setFilters}
+            />
 
             <div className="mt-6 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white shadow-sm">
-              <AnalysisTable maxBodyHeight={384} rows={historyAnalyses} showActions />
-
-              <footer className="flex flex-col gap-4 border-t border-[var(--color-border)] px-5 py-4 text-body-sm text-[var(--color-text-muted)] md:flex-row md:items-center md:justify-between">
-                <p>Menampilkan 1-8 dari 32 hasil</p>
-                <div className="flex items-center gap-2">
-                  {['<', '1', '2', '3', '4', '>'].map((page) => (
-                    <button
-                      className={`grid size-8 place-items-center rounded-[var(--radius-md)] border border-[var(--color-border)] text-label-sm font-bold transition-colors hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] ${
-                        page === '1' ? 'bg-[var(--color-primary)] text-white hover:text-white' : 'bg-white text-[var(--color-text)]'
-                      }`}
-                      key={page}
-                      type="button"
-                    >
-                      {page}
-                    </button>
-                  ))}
+              {isLoading && !history ? (
+                <div className="p-8">
+                  <LoadingContent />
                 </div>
-              </footer>
+              ) : (
+                <AnalysisTable
+                  maxBodyHeight={384}
+                  rows={history?.items ?? []}
+                  showActions
+                  onDownload={handleDownload}
+                  onView={(row) => navigateTo(`/analysis/${row.sessionId ?? row.id}`)}
+                />
+              )}
+
+              <HistoryPagination
+                pagination={history?.pagination}
+                onPageChange={(page) => setFilters((current) => ({ ...current, page }))}
+              />
             </div>
           </section>
         </section>
       </main>
     </>
-  )
-}
-
-function FilterChip({ children }: { children: string }) {
-  return (
-    <button
-      className="h-9 rounded-[var(--radius-full)] border border-[var(--color-border)] bg-white px-4 text-label-sm font-bold text-[var(--color-text)] transition-colors hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-primary-100)]"
-      type="button"
-    >
-      {children}
-    </button>
   )
 }

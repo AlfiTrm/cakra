@@ -121,6 +121,7 @@ function mapAnalysis(analysis: DashboardAnalysis): LatestAnalysis {
     id: analysis.sku_id,
     rop: analysis.reorder_point,
     roq: analysis.reorder_quantity,
+    sessionId: analysis.session_id,
     skuName: analysis.sku_name,
     status: mapRiskStatus(analysis.risk_label),
   }

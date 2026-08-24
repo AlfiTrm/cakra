@@ -103,6 +103,10 @@ function App() {
     return <AppPlaceholder title="Analisis Baru" />
   }
 
+  if (path.startsWith('/analysis/')) {
+    return <AppPlaceholder title="Detail Analisis" />
+  }
+
   if (path === '/dashboard') {
     return <DashboardPage />
   }
