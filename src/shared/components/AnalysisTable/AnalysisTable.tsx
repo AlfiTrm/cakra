@@ -8,6 +8,7 @@ export type AnalysisTableRow = {
   id: string
   rop: number
   roq: number
+  sessionId?: string
   skuName: string
   status: AnalysisRiskStatus
 }
@@ -15,6 +16,8 @@ export type AnalysisTableRow = {
 type AnalysisTableProps = {
   emptyMessage?: string
   maxBodyHeight?: number
+  onDownload?: (row: AnalysisTableRow) => void
+  onView?: (row: AnalysisTableRow) => void
   rows: AnalysisTableRow[]
   showActions?: boolean
 }
@@ -25,7 +28,14 @@ const statusClass: Record<AnalysisRiskStatus, string> = {
   'Stok Mati': 'bg-[var(--color-neutral-100)] text-[var(--color-neutral-600)]',
 }
 
-export function AnalysisTable({ emptyMessage = 'Belum ada hasil analisis.', maxBodyHeight, rows, showActions = false }: AnalysisTableProps) {
+export function AnalysisTable({
+  emptyMessage = 'Belum ada hasil analisis.',
+  maxBodyHeight,
+  onDownload,
+  onView,
+  rows,
+  showActions = false,
+}: AnalysisTableProps) {
   const columnCount = showActions ? 7 : 6
 
   return (
@@ -79,14 +89,18 @@ export function AnalysisTable({ emptyMessage = 'Belum ada hasil analisis.', maxB
                     <div className="flex justify-end gap-2">
                       <button
                         aria-label={`Lihat analisis ${analysis.skuName}`}
-                        className="grid size-8 place-items-center rounded-[var(--radius-md)] bg-[var(--color-primary-50)] text-[var(--color-primary)] transition-colors hover:bg-[var(--color-primary-100)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-primary-100)]"
+                        className="grid size-8 place-items-center rounded-[var(--radius-md)] bg-[var(--color-primary-50)] text-[var(--color-primary)] transition-colors hover:bg-[var(--color-primary-100)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-primary-100)] disabled:pointer-events-none disabled:opacity-45"
+                        disabled={!onView}
+                        onClick={() => onView?.(analysis)}
                         type="button"
                       >
                         <Icon className="size-4" icon="lucide:eye" />
                       </button>
                       <button
                         aria-label={`Unduh analisis ${analysis.skuName}`}
-                        className="grid size-8 place-items-center rounded-[var(--radius-md)] bg-[var(--color-success-50)] text-[var(--color-success)] transition-colors hover:bg-[var(--color-success-100)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-success-100)]"
+                        className="grid size-8 place-items-center rounded-[var(--radius-md)] bg-[var(--color-success-50)] text-[var(--color-success)] transition-colors hover:bg-[var(--color-success-100)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-success-100)] disabled:pointer-events-none disabled:opacity-45"
+                        disabled={!onDownload}
+                        onClick={() => onDownload?.(analysis)}
                         type="button"
                       >
                         <Icon className="size-4" icon="lucide:download" />
