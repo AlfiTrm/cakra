@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import logoPrimary from '../../../assets/brand/logo-primary-default.svg'
+import logoSecondary from '../../../assets/brand/logo-secondary-default.svg'
 import { AuthDecorPanel, AuthInput, AuthSubmitButton } from '../components'
 import type { FormEvent } from 'react'
 import { navigateTo } from '../../../shared/utils/navigation'
@@ -47,14 +47,14 @@ export function CreatePasswordPage() {
         <section className="flex h-full flex-col px-7 py-7 sm:px-12 lg:px-16">
           <header className="flex items-center justify-between">
             <a aria-label="Cakra home" href="/">
-              <img alt="Cakra" className="h-8 w-auto" src={logoPrimary} />
+              <img alt="Cakra" className="h-8 w-auto" src={logoSecondary} />
             </a>
             <a className="text-label-md font-bold text-[var(--color-primary)] underline" href="/auth/register">
               Ubah akun email
             </a>
           </header>
 
-          <div className="flex flex-1 items-center py-8">
+          <div className="flex flex-1 items-center justify-center py-8">
             <div className="w-full max-w-[480px]">
               <h1 className="text-display-sm text-[var(--color-text)]">Buat Password</h1>
               <p className="mt-3 text-body-md text-[var(--color-text-muted)]">

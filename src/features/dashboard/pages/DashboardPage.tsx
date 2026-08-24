@@ -38,7 +38,12 @@ export function DashboardPage() {
 
   return (
     <>
-      <Navbar userName={dashboard?.userName} variant="app" />
+      <Navbar
+        availableCredits={dashboard?.creditUsage.availableCredits}
+        totalCredits={dashboard?.creditUsage.balance}
+        userName={dashboard?.userName}
+        variant="app"
+      />
       <main className="min-h-[calc(100vh-72px)] bg-[#fffdfa]">
         {isLoading && !dashboard ? (
           <DashboardSkeleton />

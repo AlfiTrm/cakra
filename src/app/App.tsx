@@ -1,19 +1,30 @@
-import { useEffect, useState } from 'react'
-import { HomePage } from '../features/home/pages/HomePage'
-import { Footer } from '../features/home/components/Footer'
-import { Navbar } from '../features/home/components/Navbar'
-import { DashboardPage } from '../features/dashboard/pages/DashboardPage'
-import { HistoryPage } from '../features/history/pages/HistoryPage'
-import { LoadingPage, NotFoundPage } from '../shared/components'
+import { lazy, Suspense, useEffect, useState } from 'react'
+import { LoadingPage } from '../shared/components/feedback/LoadingPage'
 import { NAVIGATION_EVENT } from '../shared/utils/navigation'
-import { RegisterPage } from '../features/auth/pages/RegisterPage'
-import { RegisterOtpPage } from '../features/auth/pages/RegisterOtpPage'
-import { CreatePasswordPage } from '../features/auth/pages/CreatePasswordPage'
-import { ForgotPasswordPage } from '../features/auth/pages/ForgotPasswordPage'
-import { ForgotPasswordOtpPage } from '../features/auth/pages/ForgotPasswordOtpPage'
-import { LoginPage } from '../features/auth/pages/LoginPage'
-import { ResetPasswordPage } from '../features/auth/pages/ResetPasswordPage'
 import { AUTH_LOGOUT_EVENT, isAuthenticated } from '../shared/services/authToken'
+import type { ReactNode } from 'react'
+
+const HomePage = lazy(() => import('../features/home/pages/HomePage').then((module) => ({ default: module.HomePage })))
+const Footer = lazy(() => import('../features/home/components/Footer').then((module) => ({ default: module.Footer })))
+const Navbar = lazy(() => import('../features/home/components/Navbar').then((module) => ({ default: module.Navbar })))
+const DashboardPage = lazy(() => import('../features/dashboard/pages/DashboardPage').then((module) => ({ default: module.DashboardPage })))
+const HistoryPage = lazy(() => import('../features/history/pages/HistoryPage').then((module) => ({ default: module.HistoryPage })))
+const NotFoundPage = lazy(() => import('../shared/components/feedback/NotFoundPage').then((module) => ({ default: module.NotFoundPage })))
+const RegisterPage = lazy(() => import('../features/auth/pages/RegisterPage').then((module) => ({ default: module.RegisterPage })))
+const RegisterOtpPage = lazy(() => import('../features/auth/pages/RegisterOtpPage').then((module) => ({ default: module.RegisterOtpPage })))
+const CreatePasswordPage = lazy(() =>
+  import('../features/auth/pages/CreatePasswordPage').then((module) => ({ default: module.CreatePasswordPage })),
+)
+const ForgotPasswordPage = lazy(() =>
+  import('../features/auth/pages/ForgotPasswordPage').then((module) => ({ default: module.ForgotPasswordPage })),
+)
+const ForgotPasswordOtpPage = lazy(() =>
+  import('../features/auth/pages/ForgotPasswordOtpPage').then((module) => ({ default: module.ForgotPasswordOtpPage })),
+)
+const LoginPage = lazy(() => import('../features/auth/pages/LoginPage').then((module) => ({ default: module.LoginPage })))
+const ResetPasswordPage = lazy(() =>
+  import('../features/auth/pages/ResetPasswordPage').then((module) => ({ default: module.ResetPasswordPage })),
+)
 
 function App() {
   const [isLoading, setIsLoading] = useState(false)
@@ -79,71 +90,52 @@ function App() {
     }
   }, [])
 
-  if (isLoading) {
-    return <LoadingPage />
-  }
+  useEffect(() => {
+    if (!isLoading && isAuthPath(path) && isAuthenticated()) {
+      window.history.replaceState({}, '', '/dashboard')
+      setPath('/dashboard')
+    }
+  }, [isLoading, path])
+
+  if (isLoading) return <LoadingPage />
+
+  let route: ReactNode
 
   if (isProtectedPath(path) && !isAuthenticated()) {
-    return <LoginPage />
+    route = <LoginPage />
+  } else if (path === '/privacy') {
+    route = <LegalPage title="Kebijakan Privasi" />
+  } else if (path === '/terms') {
+    route = <LegalPage title="Syarat Ketentuan Layanan" />
+  } else if (path === '/history') {
+    route = <HistoryPage />
+  } else if (path === '/analysis/new') {
+    route = <AppPlaceholder title="Analisis Baru" />
+  } else if (path.startsWith('/analysis/')) {
+    route = <AppPlaceholder title="Detail Analisis" />
+  } else if (path === '/dashboard') {
+    route = <DashboardPage />
+  } else if (path === '/auth/reset-password') {
+    route = <ResetPasswordPage />
+  } else if (path === '/auth/forgot-password/otp') {
+    route = <ForgotPasswordOtpPage />
+  } else if (path === '/auth/forgot-password') {
+    route = <ForgotPasswordPage />
+  } else if (path === '/auth/login') {
+    route = <LoginPage />
+  } else if (path === '/auth/register/password') {
+    route = <CreatePasswordPage />
+  } else if (path === '/auth/register/otp') {
+    route = <RegisterOtpPage />
+  } else if (path === '/auth/register') {
+    route = <RegisterPage />
+  } else if (path === '/') {
+    route = <HomePage />
+  } else {
+    route = <NotFoundRoute path={path} />
   }
 
-  if (path === '/privacy') {
-    return <LegalPage title="Kebijakan Privasi" />
-  }
-
-  if (path === '/terms') {
-    return <LegalPage title="Syarat Ketentuan Layanan" />
-  }
-
-  if (path === '/history') {
-    return <HistoryPage />
-  }
-
-  if (path === '/analysis/new') {
-    return <AppPlaceholder title="Analisis Baru" />
-  }
-
-  if (path.startsWith('/analysis/')) {
-    return <AppPlaceholder title="Detail Analisis" />
-  }
-
-  if (path === '/dashboard') {
-    return <DashboardPage />
-  }
-
-  if (path === '/auth/reset-password') {
-    return <ResetPasswordPage />
-  }
-
-  if (path === '/auth/forgot-password/otp') {
-    return <ForgotPasswordOtpPage />
-  }
-
-  if (path === '/auth/forgot-password') {
-    return <ForgotPasswordPage />
-  }
-
-  if (path === '/auth/login') {
-    return <LoginPage />
-  }
-
-  if (path === '/auth/register/password') {
-    return <CreatePasswordPage />
-  }
-
-  if (path === '/auth/register/otp') {
-    return <RegisterOtpPage />
-  }
-
-  if (path === '/auth/register') {
-    return <RegisterPage />
-  }
-
-  if (path === '/') {
-    return <HomePage />
-  }
-
-  return <NotFoundRoute path={path} />
+  return <Suspense fallback={<LoadingPage />}>{route}</Suspense>
 }
 
 function NotFoundRoute({ path }: { path: string }) {
@@ -160,6 +152,10 @@ function NotFoundRoute({ path }: { path: string }) {
 
 function isProtectedPath(path: string) {
   return ['/dashboard', '/analysis', '/history', '/settings'].some((appPath) => path.startsWith(appPath))
+}
+
+function isAuthPath(path: string) {
+  return path.startsWith('/auth/')
 }
 
 function AppPlaceholder({ title }: { title: string }) {

@@ -1,4 +1,3 @@
-import { Icon } from '@iconify/react'
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
 type AuthSubmitButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -19,10 +18,9 @@ export function AuthSubmitButton({ children, className = '', isLoading = false, 
       >
         <span className={`[cursor:inherit] ${isLoading ? 'opacity-0' : ''}`}>{children}</span>
         {isLoading ? (
-          <Icon
+          <span
             aria-hidden="true"
-            className="absolute left-1/2 top-1/2 size-5 -translate-x-1/2 -translate-y-1/2 animate-spin [cursor:inherit]"
-            icon="lucide:loader-circle"
+            className="absolute left-1/2 top-1/2 size-5 -translate-x-1/2 -translate-y-1/2 animate-spin rounded-full border-2 border-white/35 border-t-white [cursor:inherit]"
           />
         ) : null}
       </button>

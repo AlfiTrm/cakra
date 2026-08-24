@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import logoPrimary from '../../../assets/brand/logo-primary-default.svg'
+import logoSecondary from '../../../assets/brand/logo-secondary-default.svg'
 import { AuthDecorPanel, AuthSubmitButton, OtpInput } from '../components'
 import type { FormEvent } from 'react'
 import { navigateTo } from '../../../shared/utils/navigation'
-import { getResetSessionToken } from '../services/authStorage'
+import { getResetSessionToken, setResetSessionToken } from '../services/authStorage'
 import { resendForgotPasswordOtp, verifyForgotPasswordOtp } from '../services/authService'
 
 export function ForgotPasswordOtpPage() {
@@ -12,13 +12,8 @@ export function ForgotPasswordOtpPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
   const [otp, setOtp] = useState('')
+  const [remainingSeconds, setRemainingSeconds] = useState(300)
   const [shouldAutoSubmit, setShouldAutoSubmit] = useState(true)
-
-  useEffect(() => {
-    if (otp.length === 6 && shouldAutoSubmit && !isSubmitting) {
-      void submitOtp()
-    }
-  }, [isSubmitting, otp, shouldAutoSubmit])
 
   async function submitOtp() {
     const sessionToken = getResetSessionToken()
@@ -32,7 +27,8 @@ export function ForgotPasswordOtpPage() {
     setIsSubmitting(true)
 
     try {
-      await verifyForgotPasswordOtp(sessionToken, otp)
+      const response = await verifyForgotPasswordOtp(sessionToken, otp)
+      setResetSessionToken(response.sessionToken)
       navigateTo('/auth/reset-password')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'OTP tidak valid.')
@@ -61,6 +57,7 @@ export function ForgotPasswordOtpPage() {
     try {
       const response = await resendForgotPasswordOtp(sessionToken)
       setMessage(response.message)
+      setRemainingSeconds(300)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Gagal mengirim ulang OTP.')
     } finally {
@@ -68,20 +65,39 @@ export function ForgotPasswordOtpPage() {
     }
   }
 
+  useEffect(() => {
+    if (otp.length === 6 && shouldAutoSubmit && !isSubmitting) {
+      setShouldAutoSubmit(false)
+      void submitOtp()
+    }
+  }, [isSubmitting, otp, shouldAutoSubmit])
+
+  useEffect(() => {
+    if (remainingSeconds <= 0) return
+
+    const intervalId = window.setInterval(() => {
+      setRemainingSeconds((seconds) => Math.max(seconds - 1, 0))
+    }, 1000)
+
+    return () => window.clearInterval(intervalId)
+  }, [remainingSeconds])
+
+  const timerLabel = `${String(Math.floor(remainingSeconds / 60)).padStart(2, '0')}.${String(remainingSeconds % 60).padStart(2, '0')}`
+
   return (
     <main className="h-screen overflow-hidden bg-[#fffdfa]">
       <div className="mx-auto grid h-full w-full max-w-[1440px] lg:grid-cols-[1fr_630px]">
         <section className="flex h-full flex-col px-7 py-7 sm:px-12 lg:px-16">
           <header className="flex items-center justify-between">
             <a aria-label="Cakra home" href="/">
-              <img alt="Cakra" className="h-8 w-auto" src={logoPrimary} />
+              <img alt="Cakra" className="h-8 w-auto" src={logoSecondary} />
             </a>
             <a className="text-label-md font-bold text-[var(--color-primary)] underline" href="/auth/login">
               Kembali ke Masuk
             </a>
           </header>
 
-          <div className="flex flex-1 items-center py-8">
+          <div className="flex flex-1 items-center justify-center py-8">
             <div className="w-full max-w-[480px]">
               <h1 className="text-display-sm text-[var(--color-text)]">Masukkan kode OTP</h1>
               <p className="mt-3 text-body-md text-[var(--color-text-muted)]">
@@ -94,6 +110,7 @@ export function ForgotPasswordOtpPage() {
                   value={otp}
                   onChange={(nextOtp) => {
                     setOtp(nextOtp)
+                    setShouldAutoSubmit(true)
                     if (error) setError('')
                   }}
                 />
@@ -110,11 +127,11 @@ export function ForgotPasswordOtpPage() {
                 Tidak menerima kode?{' '}
                 <button
                   className="font-bold text-[var(--color-primary)] disabled:cursor-not-allowed disabled:opacity-60"
-                  disabled={isResending}
+                  disabled={isResending || remainingSeconds > 0}
                   onClick={handleResend}
                   type="button"
                 >
-                  {isResending ? 'Mengirim...' : 'Kirim ulang'}
+                  {isResending ? 'Mengirim...' : remainingSeconds > 0 ? `kirim ulang dalam ${timerLabel}` : 'Kirim ulang'}
                 </button>
               </p>
             </div>
