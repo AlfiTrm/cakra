@@ -9,6 +9,11 @@ const Footer = lazy(() => import('../features/home/components/Footer').then((mod
 const Navbar = lazy(() => import('../features/home/components/Navbar').then((module) => ({ default: module.Navbar })))
 const DashboardPage = lazy(() => import('../features/dashboard/pages/DashboardPage').then((module) => ({ default: module.DashboardPage })))
 const HistoryPage = lazy(() => import('../features/history/pages/HistoryPage').then((module) => ({ default: module.HistoryPage })))
+const AnalysisConfigPage = lazy(() => import('../features/analysis/pages/AnalysisConfigPage').then((module) => ({ default: module.AnalysisConfigPage })))
+const AnalysisResultPage = lazy(() => import('../features/analysis/pages/AnalysisResultPage').then((module) => ({ default: module.AnalysisResultPage })))
+const AnalysisRunningPage = lazy(() => import('../features/analysis/pages/AnalysisRunningPage').then((module) => ({ default: module.AnalysisRunningPage })))
+const NewAnalysisPage = lazy(() => import('../features/analysis/pages/NewAnalysisPage').then((module) => ({ default: module.NewAnalysisPage })))
+const AnalysisPreviewPage = lazy(() => import('../features/analysis/pages/AnalysisPreviewPage').then((module) => ({ default: module.AnalysisPreviewPage })))
 const NotFoundPage = lazy(() => import('../shared/components/feedback/NotFoundPage').then((module) => ({ default: module.NotFoundPage })))
 const RegisterPage = lazy(() => import('../features/auth/pages/RegisterPage').then((module) => ({ default: module.RegisterPage })))
 const RegisterOtpPage = lazy(() => import('../features/auth/pages/RegisterOtpPage').then((module) => ({ default: module.RegisterOtpPage })))
@@ -109,10 +114,20 @@ function App() {
     route = <LegalPage title="Syarat Ketentuan Layanan" />
   } else if (path === '/history') {
     route = <HistoryPage />
+  } else if (path === '/analysis/new/config') {
+    route = <AnalysisConfigPage />
+  } else if (path === '/analysis/new/running') {
+    route = <AnalysisRunningPage />
+  } else if (path === '/analysis/new/preview') {
+    route = <AnalysisPreviewPage />
   } else if (path === '/analysis/new') {
-    route = <AppPlaceholder title="Analisis Baru" />
+    route = <NewAnalysisPage />
+  } else if (path === '/analysis/indomie-goreng') {
+    route = <AnalysisResultPage />
   } else if (path.startsWith('/analysis/')) {
     route = <AppPlaceholder title="Detail Analisis" />
+  } else if (path === '/settings') {
+    route = <AppPlaceholder title="Pengaturan" />
   } else if (path === '/dashboard') {
     route = <DashboardPage />
   } else if (path === '/auth/reset-password') {
