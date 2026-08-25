@@ -1,6 +1,6 @@
 const uploadTips = [
   'Pastikan data memiliki kolom tanggal dan jumlah_terjual',
-  'Minimal 30 hari data untuk hasil optimal',
+  'Minimal 90 hari data penjualan untuk bisa dianalisis',
   'Maksimal 365 hari data per analisis',
 ]
 

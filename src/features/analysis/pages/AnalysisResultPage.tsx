@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
+import logoSecondary from '../../../assets/brand/logo-secondary-default.svg'
 import { LoadingContent } from '../../../shared/components/feedback/LoadingContent'
 import { Navbar } from '../../home/components/Navbar'
 import { navigateTo } from '../../../shared/utils/navigation'
@@ -42,10 +43,12 @@ export function AnalysisResultPage({ sessionId }: AnalysisResultPageProps) {
 
   return (
     <>
-      <Navbar availableCredits={result?.availableCredits} variant="app" />
-      <main className="min-h-[calc(100vh-72px)] bg-[#fffdfa]">
-        <section className="app-container py-8 md:py-10">
-          <a className="inline-flex items-center gap-2 text-label-sm font-bold text-[var(--color-primary)] hover:text-[var(--color-primary-hover)]" href="/dashboard">
+      <div className="print:hidden">
+        <Navbar availableCredits={result?.availableCredits} variant="app" />
+      </div>
+      <main className="min-h-[calc(100vh-72px)] bg-[#fffdfa] print:min-h-0 print:bg-white">
+        <section className="analysis-report-page app-container py-8 md:py-10 print:max-w-none print:px-0 print:py-0">
+          <a className="inline-flex items-center gap-2 text-label-sm font-bold text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] print:hidden" href="/dashboard">
             <ChevronLeftIcon />
             Kembali ke Dashboard
           </a>
@@ -60,8 +63,10 @@ export function AnalysisResultPage({ sessionId }: AnalysisResultPageProps) {
             </div>
           ) : result?.status !== 'COMPLETED' ? (
             <div className="mt-8 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 text-center shadow-lg shadow-[rgb(15_23_42_/_0.06)]">
-              <h1 className="text-heading-md text-[var(--color-text)]">Analisis masih diproses</h1>
-              <p className="mt-2 text-body-md text-[var(--color-text-muted)]">Tunggu sebentar, lalu buka kembali hasil analisis ini.</p>
+              <h1 className="text-heading-md text-[var(--color-text)]">Analisis belum tersedia</h1>
+              <p className="mt-2 text-body-md text-[var(--color-text-muted)]">
+                {result?.failureMessage ?? 'Tunggu sebentar, lalu buka kembali hasil analisis ini.'}
+              </p>
               <button
                 className="mt-6 h-11 rounded-[var(--radius-lg)] bg-[var(--color-primary)] px-6 text-label-md font-bold text-white"
                 onClick={() => navigateTo('/dashboard')}
@@ -80,109 +85,101 @@ export function AnalysisResultPage({ sessionId }: AnalysisResultPageProps) {
 }
 
 function AnalysisResultContent({ result }: { result: AnalysisResultViewModel }) {
-  const maxP90 = Math.max(...result.forecast.map((point) => point.p90), 1)
   const riskTone = result.riskLabel === 'NORMAL' ? 'success' : 'danger'
+  const isStockLow = result.currentStock <= result.reorderPoint
 
   return (
     <>
-      <header className="mt-8 flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+      <style>{'@media print { @page { size: A4 portrait; margin: 0; } .analysis-report-page { padding: 10mm !important; } }'}</style>
+
+      <header className="mt-7 flex flex-col gap-4 md:flex-row md:items-start md:justify-between print:mt-0 print:gap-2">
         <div>
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-heading-xl text-[var(--color-text)]">{result.skuName}</h1>
-            <Badge>{result.demandCategory}</Badge>
-            <Badge>SKU: {result.skuId.slice(0, 8)}</Badge>
+          <div className="mb-3 hidden items-center justify-between gap-4 border-b border-[var(--color-border)] pb-2 text-[11px] print:flex">
+            <img alt="Cakra" className="size-7" src={logoSecondary} />
+            <span className="text-[var(--color-text-muted)]">Laporan Analisis SKU · {formatLongDate(result.analysisDate)}</span>
           </div>
-          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-body-sm text-[var(--color-text-muted)]">
-            <span>
-              Tanggal Analisis: <strong className="text-[var(--color-text)]">{result.analysisDate}</strong>
-            </span>
-            <span>
-              Data Penjualan: <strong className="text-[var(--color-text)]">{result.historicalRowCount} baris</strong>
-            </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-heading-lg text-[var(--color-text)] md:text-heading-xl print:text-heading-md">{result.skuName}</h1>
+            <Badge>{formatDemandCategory(result.demandCategory)}</Badge>
+          </div>
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-body-sm text-[var(--color-text-muted)] print:text-[11px]">
+            <span>{formatLongDate(result.analysisDate)}</span>
+            <span>{result.historicalDays} hari data penjualan</span>
+            <span>SKU {result.skuId.slice(0, 8)}</span>
           </div>
         </div>
-        <button className="inline-flex h-10 items-center justify-center gap-2 rounded-[var(--radius-full)] border border-[var(--color-primary)] px-5 text-label-md font-bold text-[var(--color-primary)] transition-colors hover:bg-[var(--color-primary-50)]" type="button">
+        <button
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-[var(--radius-lg)] border border-[var(--color-primary)] px-5 text-label-md font-bold text-[var(--color-primary)] transition-colors hover:bg-[var(--color-primary-50)] print:hidden"
+          onClick={() => window.print()}
+          type="button"
+        >
           <DownloadIcon />
-          Export PDF
+          Unduh PDF
         </button>
       </header>
 
-      <section
-        className={`mt-8 flex flex-col gap-4 rounded-[var(--radius-xl)] border px-5 py-5 md:flex-row md:items-center md:justify-between ${
-          riskTone === 'success'
-            ? 'border-[var(--color-success-200)] bg-[var(--color-success-50)]'
-            : 'border-[var(--color-danger-200)] bg-[var(--color-danger-50)]'
-        }`}
-      >
-        <div className="flex items-start gap-4">
-          <span
-            className={`grid size-10 shrink-0 place-items-center rounded-[var(--radius-full)] ${
-              riskTone === 'success' ? 'bg-[var(--color-success-100)] text-[var(--color-success)]' : 'bg-[var(--color-danger-100)] text-[var(--color-danger)]'
-            }`}
-          >
-            <AlertIcon />
-          </span>
-          <div>
-            <h2 className={`text-label-lg font-bold ${riskTone === 'success' ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'}`}>
-              {formatRiskLabel(result.riskLabel)}
-            </h2>
-            <p className="mt-1 text-body-sm text-[var(--color-text-muted)]">{result.riskReason}</p>
-          </div>
-        </div>
-        {riskTone === 'danger' ? (
-          <button className="h-11 rounded-[var(--radius-full)] bg-[var(--color-danger)] px-7 text-label-md font-bold text-white transition-colors hover:bg-[var(--color-danger-700)]" type="button">
-            Pesan Sekarang
-          </button>
-        ) : null}
-      </section>
-
-      <section className="mt-8 grid gap-6 md:grid-cols-2">
-        <MetricCard helper="Pesan ulang saat stok mencapai angka ini" label="Reorder Point (ROP)" tone="primary" value={`${result.reorderPoint} unit`} />
-        <MetricCard helper="Jumlah optimal untuk dipesan" label="Reorder Quantity (ROQ)" tone="success" value={`${result.reorderQuantity} unit`} />
-      </section>
-
-      <section className="mt-8 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-lg shadow-[rgb(15_23_42_/_0.06)]">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="flex items-center gap-2 text-heading-sm text-[var(--color-text)]">
-            <BarsIcon />
-            Proyeksi Permintaan {result.forecast.length} Hari
-          </h2>
-          <div className="flex gap-4 text-label-sm text-[var(--color-text)]">
-            <Legend color="bg-[var(--color-primary)]" label="P50 (Median)" />
-            <Legend color="bg-[var(--color-success)]" label="P90 (Batas Atas)" />
-          </div>
-        </div>
-        <div className="mt-8 flex h-[260px] items-end justify-between gap-2 px-2">
-          {result.forecast.map((point) => (
-            <div className="grid flex-1 gap-2" key={point.date}>
-              <div className="flex h-[210px] items-end justify-center gap-2">
-                <span className="w-2 rounded-t-[var(--radius-full)] bg-[var(--color-primary)]" style={{ height: `${Math.max(12, (point.p50 / maxP90) * 190)}px` }} />
-                <span className="w-2 rounded-t-[var(--radius-full)] bg-[var(--color-success)]" style={{ height: `${Math.max(12, (point.p90 / maxP90) * 190)}px` }} />
-              </div>
-              <span className="text-center text-body-xs text-[var(--color-text-muted)]">{formatShortDate(point.date)}</span>
+      <article className="mt-5 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white shadow-lg shadow-[rgb(15_23_42_/_0.06)] print:mt-3 print:rounded-none print:shadow-none">
+        <section className="grid border-b border-[var(--color-border)] lg:grid-cols-[1.25fr_1fr]">
+          <div className={`flex gap-3 px-5 py-4 ${riskTone === 'success' ? 'bg-[var(--color-success-50)]' : 'bg-[var(--color-danger-50)]'} print:px-4 print:py-3`}>
+            <span className={`mt-0.5 grid size-8 shrink-0 place-items-center rounded-full ${riskTone === 'success' ? 'bg-[var(--color-success-100)] text-[var(--color-success)]' : 'bg-[var(--color-danger-100)] text-[var(--color-danger)]'}`}>
+              <AlertIcon />
+            </span>
+            <div>
+              <p className={`text-label-md font-bold ${riskTone === 'success' ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'}`}>{formatRiskLabel(result.riskLabel)}</p>
+              <p className="mt-1 max-w-[70ch] text-body-sm text-[var(--color-text-muted)] print:text-[11px]">{result.riskReason}</p>
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
 
-      <section className="mt-8 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-lg shadow-[rgb(15_23_42_/_0.06)]">
-        <h2 className="flex items-center gap-2 text-heading-sm text-[var(--color-text)]">
-          <DocIcon />
-          Penjelasan Analisis
-        </h2>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <SmallMetric label="Permintaan Rata-rata" value={`${formatNumber(result.averageDailyDemand)} unit/hari`} />
-          <SmallMetric label="Lead Time" value={`${result.leadTimeDays} hari`} />
-          <SmallMetric label="Target Ketersediaan" value={`${Math.round(result.targetServiceLevel * 100)}%`} />
-        </div>
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <MetricStrip label="Reorder Point (ROP)" tone="primary" value={`${result.reorderPoint} unit`} />
-          <MetricStrip label="Reorder Quantity (ROQ)" tone="success" value={`${result.reorderQuantity} unit`} />
-        </div>
-        <p className="mt-6 text-body-md leading-relaxed text-[var(--color-text-muted)]">{result.explanationText}</p>
-      </section>
+          <div className="grid grid-cols-2 divide-x divide-[var(--color-border)] border-t border-[var(--color-border)] lg:border-l lg:border-t-0">
+            <DecisionMetric label="Pesan saat stok" value={`${result.reorderPoint} unit`} />
+            <DecisionMetric emphasized label="Jumlah pemesanan" value={`${result.reorderQuantity} unit`} />
+          </div>
+        </section>
 
-      <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+        <section className="grid lg:grid-cols-[minmax(0,1.35fr)_minmax(340px,1fr)] print:grid-cols-1">
+          <div className="min-w-0 border-b border-[var(--color-border)] p-5 lg:border-b-0 lg:border-r print:p-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-heading-sm text-[var(--color-text)]">Proyeksi permintaan {result.forecast.length} hari</h2>
+                <p className="mt-1 text-body-sm text-[var(--color-text-muted)] print:text-[11px]">Perkiraan kebutuhan harian untuk membantu menentukan waktu pemesanan.</p>
+              </div>
+              <div className="flex shrink-0 gap-4 text-label-sm text-[var(--color-text)]">
+                <Legend color="bg-[var(--color-primary)]" label="Kebutuhan umum" />
+                <Legend color="bg-[var(--color-success)]" label="Batas aman" />
+              </div>
+            </div>
+            <ForecastChart forecast={result.forecast} />
+          </div>
+
+          <aside className="p-5 print:grid print:grid-cols-[1.15fr_0.85fr] print:gap-5 print:p-4">
+            <div>
+              <h2 className="text-heading-sm text-[var(--color-text)]">Apa artinya untuk toko Anda?</h2>
+              <p className="mt-3 text-body-sm leading-relaxed text-[var(--color-text-muted)] print:mt-2 print:text-[11px] print:leading-relaxed">{result.explanationText}</p>
+              <p className="mt-4 rounded-[var(--radius-md)] bg-[var(--color-neutral-50)] px-3 py-2 text-body-xs text-[var(--color-text-muted)] print:mt-3 print:text-[10px]">
+                Rekomendasi dihitung dari pola penjualan historis dan kondisi stok saat analisis dilakukan.
+              </p>
+            </div>
+
+            <dl className="mt-5 divide-y divide-[var(--color-border)] border-y border-[var(--color-border)] print:mt-0">
+              <FactRow label="Stok sekarang" tone={isStockLow ? 'danger' : undefined} value={`${result.currentStock} unit`} />
+              <FactRow label="Rata-rata terjual" value={`${formatNumber(result.averageDailyDemand)} unit/hari`} />
+              <FactRow label="Waktu tunggu pemasok" value={`${result.leadTimeDays} hari`} />
+              <FactRow label="Data dianalisis" value={`${result.historicalRowCount} transaksi`} />
+            </dl>
+
+            {riskTone === 'danger' ? (
+              <button
+                className="mt-4 h-11 w-full rounded-[var(--radius-lg)] bg-[var(--color-danger)] px-5 text-label-md font-bold text-white transition-colors hover:bg-[var(--color-danger-700)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-danger-200)] print:hidden"
+                type="button"
+              >
+                Pesan Sekarang
+              </button>
+            ) : null}
+          </aside>
+        </section>
+      </article>
+
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row print:hidden">
         <button className="h-12 rounded-[var(--radius-lg)] bg-[var(--color-primary)] px-8 text-label-md font-bold text-white shadow-lg shadow-[rgb(45_82_221_/_0.22)] transition-colors hover:bg-[var(--color-primary-hover)]" onClick={() => navigateTo('/analysis/new')} type="button">
           Analisis SKU Lain
         </button>
@@ -197,38 +194,91 @@ function AnalysisResultContent({ result }: { result: AnalysisResultViewModel }) 
   )
 }
 
-function Badge({ children }: { children: ReactNode }) {
-  return <span className="rounded-[var(--radius-full)] bg-[var(--color-primary-50)] px-3 py-1 text-label-sm font-bold text-[var(--color-primary)]">{children}</span>
-}
+function ForecastChart({ forecast }: { forecast: AnalysisResultViewModel['forecast'] }) {
+  const width = Math.max(560, forecast.length * 76 + 50)
+  const height = 205
+  const padding = { bottom: 30, left: 38, right: 12, top: 14 }
+  const plotWidth = width - padding.left - padding.right
+  const plotHeight = height - padding.top - padding.bottom
 
-function MetricCard({ helper, label, tone, value }: { helper: string; label: string; tone: 'primary' | 'success'; value: string }) {
-  const colorClass = tone === 'primary' ? 'bg-[var(--color-primary-50)]' : 'bg-[var(--color-success-50)]'
+  if (!forecast.length) {
+    return <div className="mt-5 rounded-[var(--radius-lg)] bg-[var(--color-neutral-50)] px-4 py-10 text-center text-body-sm text-[var(--color-text-muted)]">Belum ada data proyeksi.</div>
+  }
+
+  const maxValue = Math.max(...forecast.map((point) => point.p90), 1)
+  const scaleY = (value: number) => padding.top + plotHeight - (value / maxValue) * plotHeight
+  const ticks = [0.25, 0.5, 0.75, 1].map((ratio) => Math.round(maxValue * ratio))
+  const groupWidth = plotWidth / forecast.length
+  const barWidth = Math.min(18, Math.max(8, groupWidth * 0.22))
+  const baseline = padding.top + plotHeight
 
   return (
-    <article className={`rounded-[var(--radius-xl)] border border-[var(--color-border)] p-7 shadow-lg shadow-[rgb(15_23_42_/_0.06)] ${colorClass}`}>
-      <p className="text-label-md font-bold uppercase text-[var(--color-text-muted)]">{label}</p>
-      <p className="mt-6 font-mono text-[32px] font-extrabold leading-none text-[var(--color-text)]">{value}</p>
-      <p className="mt-3 text-body-sm text-[var(--color-text-muted)]">{helper}</p>
-    </article>
-  )
-}
+    <div className="mt-3 max-w-[560px] overflow-x-auto pb-2 print:max-w-none print:overflow-visible print:pb-0">
+      <svg aria-label="Grafik proyeksi permintaan" className="h-[205px] max-w-none print:!h-[170px] print:!w-full" role="img" style={{ width }} viewBox={`0 0 ${width} ${height}`}>
+        {ticks.map((tick, index) => {
+          const y = scaleY(tick)
+          return (
+            <g key={`${tick}-${index}`}>
+              <line stroke="var(--color-neutral-200)" strokeDasharray="4 6" x1={padding.left} x2={padding.left + plotWidth} y1={y} y2={y} />
+              <text fill="var(--color-text-muted)" fontSize="11" textAnchor="end" x={padding.left - 10} y={y + 4}>
+                {tick}
+              </text>
+            </g>
+          )
+        })}
 
-function SmallMetric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white p-4">
-      <p className="text-label-sm font-bold uppercase text-[var(--color-text-muted)]">{label}</p>
-      <p className="mt-1 font-mono text-data-sm font-bold text-[var(--color-text)]">{value}</p>
+        <line stroke="var(--color-neutral-300)" x1={padding.left} x2={padding.left + plotWidth} y1={baseline} y2={baseline} />
+
+        {forecast.map((point, index) => {
+          const center = padding.left + groupWidth * index + groupWidth / 2
+          const p50Y = scaleY(point.p50)
+          const p90Y = scaleY(point.p90)
+
+          return (
+            <g key={`${point.date}-${index}`}>
+              <rect fill="var(--color-primary)" height={baseline - p50Y} width={barWidth} x={center - barWidth - 4} y={p50Y} />
+              <rect fill="var(--color-success)" height={baseline - p90Y} width={barWidth} x={center + 4} y={p90Y} />
+              <text fill="var(--color-text-muted)" fontSize="11" textAnchor="middle" x={center} y={height - 8}>
+              {formatShortDate(point.date)}
+            </text>
+            </g>
+          )
+        })}
+      </svg>
+
+      <div className="sticky left-0 mt-2 grid max-w-[560px] gap-2 border-t border-[var(--color-border)] pt-3 text-body-sm text-[var(--color-text-muted)] sm:grid-cols-3 print:max-w-none print:text-[11px]">
+        <span>
+          P50 rata-rata: <strong className="text-[var(--color-text)]">{formatNumber(average(forecast.map((point) => point.p50)))} unit</strong>
+        </span>
+        <span>
+          P90 tertinggi: <strong className="text-[var(--color-text)]">{Math.max(...forecast.map((point) => point.p90))} unit</strong>
+        </span>
+        <span>
+          Horizon: <strong className="text-[var(--color-text)]">{forecast.length} hari</strong>
+        </span>
+      </div>
     </div>
   )
 }
 
-function MetricStrip({ label, tone, value }: { label: string; tone: 'primary' | 'success'; value: string }) {
-  const colorClass = tone === 'primary' ? 'bg-[var(--color-primary-50)] text-[var(--color-primary)]' : 'bg-[var(--color-success-50)] text-[var(--color-success)]'
+function Badge({ children }: { children: ReactNode }) {
+  return <span className="rounded-[var(--radius-full)] bg-[var(--color-primary-50)] px-3 py-1 text-label-sm font-bold text-[var(--color-primary)]">{children}</span>
+}
 
+function DecisionMetric({ emphasized = false, label, value }: { emphasized?: boolean; label: string; value: string }) {
   return (
-    <div className={`rounded-[var(--radius-lg)] p-4 ${colorClass}`}>
-      <p className="text-label-sm font-bold uppercase">{label}</p>
-      <p className="mt-1 font-mono text-data-md font-bold">{value}</p>
+    <div className={`px-5 py-4 print:px-4 print:py-3 ${emphasized ? 'bg-[var(--color-primary-50)]' : ''}`}>
+      <p className="text-label-sm font-bold text-[var(--color-text-muted)]">{label}</p>
+      <p className={`mt-1 font-mono text-data-md font-extrabold ${emphasized ? 'text-[var(--color-primary)]' : 'text-[var(--color-text)]'}`}>{value}</p>
+    </div>
+  )
+}
+
+function FactRow({ label, tone, value }: { label: string; tone?: 'danger'; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-4 py-3 print:py-2">
+      <dt className="text-body-sm text-[var(--color-text-muted)] print:text-[11px]">{label}</dt>
+      <dd className={`text-right font-mono text-data-sm font-bold ${tone === 'danger' ? 'text-[var(--color-danger)]' : 'text-[var(--color-text)]'}`}>{value}</dd>
     </div>
   )
 }
@@ -243,17 +293,38 @@ function Legend({ color, label }: { color: string; label: string }) {
 }
 
 function formatRiskLabel(label: string) {
-  if (label === 'NORMAL') return 'Normal: stok saat ini masih aman.'
-  if (label === 'DEADSTOCK') return 'Deadstock: stok berisiko menumpuk.'
-  return 'Stockout Imminent: stok perlu segera dipantau.'
+  if (label === 'NORMAL') return 'Stok masih aman'
+  if (label === 'DEADSTOCK') return 'Stok berisiko menumpuk'
+  return 'Stok perlu segera dipesan'
+}
+
+function formatDemandCategory(category: string) {
+  const labels: Record<string, string> = {
+    ERRATIC: 'Permintaan tidak stabil',
+    INTERMITTENT: 'Permintaan berkala',
+    LUMPY: 'Permintaan tidak menentu',
+    SMOOTH: 'Permintaan stabil',
+  }
+
+  return labels[category] ?? category
+}
+
+function formatLongDate(value: string) {
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? 'Tanggal tidak tersedia' : new Intl.DateTimeFormat('id-ID', { dateStyle: 'long' }).format(date)
 }
 
 function formatShortDate(value: string) {
-  return new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: '2-digit' }).format(new Date(value))
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? '-' : new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: '2-digit' }).format(date)
 }
 
 function formatNumber(value: number) {
   return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(value)
+}
+
+function average(values: number[]) {
+  return values.length ? values.reduce((total, value) => total + value, 0) / values.length : 0
 }
 
 function ChevronLeftIcon() {
@@ -276,23 +347,6 @@ function AlertIcon() {
   return (
     <svg aria-hidden="true" className="size-5" fill="none" viewBox="0 0 24 24">
       <path d="M12 8v5m0 4h.01M10.3 4.5 2.7 18a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 4.5a2 2 0 0 0-3.4 0Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-    </svg>
-  )
-}
-
-function BarsIcon() {
-  return (
-    <svg aria-hidden="true" className="size-5 text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24">
-      <path d="M4 20V10m6 10V4m6 16v-7m4 7H2" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-    </svg>
-  )
-}
-
-function DocIcon() {
-  return (
-    <svg aria-hidden="true" className="size-5 text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24">
-      <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7l-5-5Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-      <path d="M14 2v5h5M9 13h6M9 17h4" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
     </svg>
   )
 }

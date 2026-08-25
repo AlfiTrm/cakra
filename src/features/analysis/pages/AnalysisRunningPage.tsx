@@ -33,6 +33,7 @@ const progressItems = [
     label: 'Menyiapkan rekomendasi',
   },
 ] as const
+const minimumRunningMs = 2800
 
 export function AnalysisRunningPage() {
   const [session] = useState(() => getStoredSession())
@@ -41,6 +42,7 @@ export function AnalysisRunningPage() {
   const [progressPercent, setProgressPercent] = useState(() => calculateProgress(Date.now() - startedAt))
   const [elapsedSeconds, setElapsedSeconds] = useState(() => Math.floor((Date.now() - startedAt) / 1000))
   const [error, setError] = useState('')
+  const [isCompleting, setIsCompleting] = useState(false)
 
   useEffect(() => {
     if (!session) {
@@ -57,7 +59,14 @@ export function AnalysisRunningPage() {
         const result = await getAnalysisSessionResult(currentSession.sessionId, controller.signal)
         if (!isMounted) return
         if (result.status === 'COMPLETED') {
-          navigateTo(`/analysis/${currentSession.sessionId}`)
+          setIsCompleting(true)
+          setProgressPercent(100)
+          window.setTimeout(
+            () => {
+              if (isMounted) navigateTo(`/analysis/${currentSession.sessionId}`)
+            },
+            Math.max(700, minimumRunningMs - (Date.now() - startedAt)),
+          )
           return
         }
         if (!isPendingStatus(result.status)) {
@@ -79,17 +88,17 @@ export function AnalysisRunningPage() {
       isMounted = false
       controller.abort()
     }
-  }, [session])
+  }, [session, startedAt])
 
   useEffect(() => {
     const interval = window.setInterval(() => {
       const elapsedMs = Date.now() - startedAt
       setElapsedSeconds(Math.floor(elapsedMs / 1000))
-      setProgressPercent((current) => (error ? current : calculateProgress(elapsedMs)))
+      setProgressPercent((current) => (error || isCompleting ? current : calculateProgress(elapsedMs)))
     }, 250)
 
     return () => window.clearInterval(interval)
-  }, [error, startedAt])
+  }, [error, isCompleting, startedAt])
 
   if (!session) return null
 
@@ -150,7 +159,7 @@ export function AnalysisRunningPage() {
                         error ? 'bg-[var(--color-danger-50)] text-[var(--color-danger)]' : 'bg-[var(--color-success-50)] text-[var(--color-success)]'
                       }`}
                     >
-                      {error ? 'Perlu diperbaiki' : 'Sedang diproses'}
+                      {error ? 'Perlu diperbaiki' : isCompleting ? 'Hampir selesai' : 'Sedang diproses'}
                     </span>
                   </div>
 

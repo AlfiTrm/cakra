@@ -62,7 +62,7 @@ export function AnalysisTable({
             const rowBg = index % 2 === 1 ? 'bg-[var(--color-neutral-50)]' : 'bg-white'
 
             return (
-              <tr className={`border-b border-[var(--color-border)] last:border-b-0 ${rowBg}`} key={analysis.id}>
+              <tr className={`border-b border-[var(--color-border)] last:border-b-0 ${rowBg}`} key={analysis.sessionId ?? `${analysis.id}-${index}`}>
                 <td className="px-6 py-4">
                   <p className="text-label-md font-bold text-[var(--color-text)]">{analysis.skuName}</p>
                   <p className="mt-1 text-body-xs text-[var(--color-text-muted)]">ID: {analysis.id}</p>

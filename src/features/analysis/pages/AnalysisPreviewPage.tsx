@@ -4,6 +4,8 @@ import { AnalysisStepper, PreviewSummaryBar, PreviewValidationTable } from '../c
 import { analysisSteps } from '../data/analysisSteps'
 import { getStoredUpload } from '../services/analysisStorage'
 
+const minimumValidRows = 90
+
 export function AnalysisPreviewPage() {
   const upload = getStoredUpload()
 
@@ -11,6 +13,8 @@ export function AnalysisPreviewPage() {
     navigateTo('/analysis/new')
     return null
   }
+
+  const hasEnoughData = upload.validRowCount >= minimumValidRows
 
   return (
     <>
@@ -70,6 +74,15 @@ export function AnalysisPreviewPage() {
               <PreviewSummaryBar errorCount={upload.errorRowCount} validCount={upload.validRowCount} />
             </div>
 
+            {!hasEnoughData ? (
+              <section className="mt-4 rounded-[var(--radius-lg)] border border-[var(--color-danger-200)] bg-[var(--color-danger-50)] px-4 py-3 text-body-sm text-[var(--color-danger)]">
+                <p className="font-bold">Data belum cukup untuk dianalisis</p>
+                <p className="mt-1">
+                  Minimal diperlukan {minimumValidRows} hari/baris data penjualan valid. File ini baru memiliki {upload.validRowCount} baris valid.
+                </p>
+              </section>
+            ) : null}
+
             <div className="mx-auto mt-8 flex max-w-[520px] flex-col gap-4 sm:flex-row sm:items-center">
               <button
                 className="h-12 px-6 text-label-md font-bold text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-primary)]"
@@ -79,7 +92,8 @@ export function AnalysisPreviewPage() {
                 Kembali
               </button>
               <button
-                className="h-12 flex-1 rounded-[var(--radius-lg)] bg-[var(--color-primary)] px-10 text-label-md font-bold text-white shadow-lg shadow-[rgb(45_82_221_/_0.22)] transition-colors hover:bg-[var(--color-primary-hover)]"
+                className="h-12 flex-1 rounded-[var(--radius-lg)] bg-[var(--color-primary)] px-10 text-label-md font-bold text-white shadow-lg shadow-[rgb(45_82_221_/_0.22)] transition-colors hover:bg-[var(--color-primary-hover)] disabled:pointer-events-none disabled:bg-[var(--color-neutral-300)] disabled:text-[var(--color-neutral-500)] disabled:shadow-none"
+                disabled={!hasEnoughData}
                 onClick={() => navigateTo('/analysis/new/config')}
                 type="button"
               >

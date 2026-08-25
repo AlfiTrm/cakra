@@ -164,7 +164,7 @@ export async function getAnalysisSessionResult(sessionId: string, signal?: Abort
   }
 
   return {
-    analysisDate: formatDate(result.analysis_date),
+    analysisDate: result.analysis_date,
     availableCredits: response.data.available_credits,
     averageDailyDemand: result.average_daily_demand,
     currentStock: result.current_stock,
@@ -211,16 +211,6 @@ function mapUploadError(row: UploadErrorResponse): PreviewErrorRow {
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat('id-ID').format(value)
-}
-
-function formatDate(value: string) {
-  if (!value) return '-'
-
-  return new Intl.DateTimeFormat('id-ID', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  }).format(new Date(value))
 }
 
 function formatFileSize(size: number) {
