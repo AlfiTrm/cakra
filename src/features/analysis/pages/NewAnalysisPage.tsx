@@ -1,12 +1,50 @@
 import { useState } from 'react'
 import { Navbar } from '../../home/components/Navbar'
 import { navigateTo } from '../../../shared/utils/navigation'
-import { AnalysisStepper, UploadPanel, UploadTips } from '../components'
-import { analysisSteps, demoUploadFile } from '../data/analysisSteps'
-import type { UploadFileState } from '../types/analysis'
+import { AnalysisStepper, UploadErrorPanel, UploadPanel, UploadTips } from '../components'
+import { analysisSteps } from '../data/analysisSteps'
+import { clearAnalysisFlow, getStoredUpload, setStoredUpload } from '../services/analysisStorage'
+import { uploadAnalysisFile } from '../services/analysisService'
+import type { UploadErrorState, UploadFileState } from '../types/analysis'
 
 export function NewAnalysisPage() {
-  const [file, setFile] = useState<UploadFileState | null>(demoUploadFile)
+  const [file, setFile] = useState<UploadFileState | null>(() => {
+    const upload = getStoredUpload()
+    if (!upload) return null
+
+    return {
+      name: upload.fileName,
+      rows: upload.validRowCount + upload.errorRowCount,
+      sizeLabel: upload.sizeLabel,
+    }
+  })
+  const [uploadError, setUploadError] = useState<UploadErrorState | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+
+  async function handleFileSelect(nextFile: File) {
+    clearAnalysisFlow()
+    setUploadError(null)
+    setIsUploading(true)
+
+    try {
+      const upload = await uploadAnalysisFile(nextFile)
+      setStoredUpload(upload)
+      setFile({
+        name: upload.fileName,
+        rows: upload.validRowCount + upload.errorRowCount,
+        sizeLabel: upload.sizeLabel,
+      })
+    } catch (err) {
+      setFile(null)
+      setUploadError({
+        fileName: nextFile.name,
+        problems: [err instanceof Error ? err.message : 'File gagal divalidasi. Coba unggah ulang.'],
+        sizeLabel: formatFileSize(nextFile.size),
+      })
+    } finally {
+      setIsUploading(false)
+    }
+  }
 
   return (
     <>
@@ -34,24 +72,35 @@ export function NewAnalysisPage() {
             </div>
 
             <div className="mt-8">
-              <UploadPanel file={file} onFileChange={setFile} />
+              {uploadError ? (
+                <UploadErrorPanel
+                  error={uploadError}
+                  onRetry={() => {
+                    setUploadError(null)
+                    setFile(null)
+                  }}
+                />
+              ) : (
+                <UploadPanel
+                  file={file}
+                  isUploading={isUploading}
+                  onFileChange={(nextFile) => {
+                    if (!nextFile) clearAnalysisFlow()
+                    setFile(nextFile)
+                  }}
+                  onFileSelect={handleFileSelect}
+                />
+              )}
             </div>
 
-            <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <button
-                className="text-left text-label-md font-bold text-[var(--color-primary)] underline hover:text-[var(--color-primary-hover)]"
-                onClick={() => navigateTo('/dashboard')}
-                type="button"
-              >
-                Batal
-              </button>
+            <div className="mt-6 flex justify-end">
               <button
                 className="h-12 rounded-[var(--radius-lg)] bg-[var(--color-primary)] px-10 text-label-md font-bold text-white shadow-lg shadow-[rgb(45_82_221_/_0.22)] transition-colors hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:bg-[var(--color-neutral-300)] disabled:text-[var(--color-neutral-500)] disabled:shadow-none sm:min-w-[360px]"
-                disabled={!file}
+                disabled={!file || isUploading || Boolean(uploadError)}
                 onClick={() => navigateTo('/analysis/new/preview')}
                 type="button"
               >
-                Lanjutkan
+                {isUploading ? 'Memvalidasi...' : 'Lanjutkan'}
               </button>
             </div>
 
@@ -63,6 +112,12 @@ export function NewAnalysisPage() {
       </main>
     </>
   )
+}
+
+function formatFileSize(size: number) {
+  if (size < 1024 * 1024) return `${Math.max(1, Math.round(size / 1024))} KB`
+
+  return `${(size / 1024 / 1024).toFixed(1)} MB`
 }
 
 function ChevronLeftIcon() {

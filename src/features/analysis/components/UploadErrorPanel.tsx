@@ -53,9 +53,10 @@ export function UploadErrorPanel({ error, onRetry }: UploadErrorPanelProps) {
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <a
           className="inline-flex h-12 items-center justify-center rounded-[var(--radius-lg)] border border-[var(--color-primary)] px-6 text-label-md font-bold text-[var(--color-primary)] transition-colors hover:bg-[var(--color-primary-50)]"
-          href="/template-analysis.xlsx"
+          download
+          href="/template-analysis.csv"
         >
-          Unduh Template XLSX
+          Unduh Template CSV
         </a>
         <button
           className="h-12 rounded-[var(--radius-lg)] bg-[var(--color-primary)] px-6 text-label-md font-bold text-white shadow-lg shadow-[rgb(45_82_221_/_0.22)] transition-colors hover:bg-[var(--color-primary-hover)]"

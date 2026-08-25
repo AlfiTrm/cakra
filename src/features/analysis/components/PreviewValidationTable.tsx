@@ -2,6 +2,7 @@ import type { PreviewErrorRow, PreviewValidRow } from '../types/analysis'
 
 type PreviewValidationTableProps =
   | {
+      hiddenRowCount?: number
       rows: PreviewValidRow[]
       title: string
       tone: 'success'
@@ -25,9 +26,9 @@ export function PreviewValidationTable(props: PreviewValidationTableProps) {
         {props.title}
       </h2>
       <div className="mt-4 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)]">
-        <div className="overflow-auto">
+        <div className="max-h-[360px] overflow-auto">
           <table className="w-full min-w-[900px] border-collapse text-left">
-            <thead className="bg-[var(--color-neutral-50)]">
+            <thead className="sticky top-0 z-10 bg-[var(--color-neutral-50)]">
               <tr className="border-b border-[var(--color-border)] text-label-sm font-bold uppercase tracking-[0.04em] text-[var(--color-text-muted)]">
                 <th className="px-5 py-3 text-center">No</th>
                 <th className="px-5 py-3">Tanggal</th>
@@ -67,9 +68,9 @@ export function PreviewValidationTable(props: PreviewValidationTableProps) {
             </tbody>
           </table>
         </div>
-        {!isDanger ? (
+        {!isDanger && props.hiddenRowCount ? (
           <p className="border-t border-[var(--color-border)] bg-[var(--color-neutral-50)] py-3 text-center text-body-xs text-[var(--color-text-muted)]">
-            ... dan 170 baris lainnya
+            Menampilkan {props.rows.length} baris awal. {props.hiddenRowCount} baris lainnya tetap masuk validasi.
           </p>
         ) : null}
       </div>

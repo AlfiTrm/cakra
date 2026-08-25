@@ -14,7 +14,7 @@ export function RetailModernSection() {
     <section
       id="cara-kerja"
       ref={ref}
-      className={`bg-[var(--color-surface)] py-16 md:py-20 ${isVisible ? 'is-stagger-visible' : ''}`}
+      className={`scroll-mt-[72px] bg-[var(--color-surface)] py-16 md:py-20 ${isVisible ? 'is-stagger-visible' : ''}`}
     >
       <div className="app-container grid min-h-[520px] items-center gap-12 lg:grid-cols-[1fr_420px] xl:grid-cols-[1fr_480px]">
         <div className="max-w-[560px]">
@@ -23,9 +23,8 @@ export function RetailModernSection() {
           </h2>
 
           <p className="animate-stagger-rise mt-6 text-body-md text-[var(--color-text-muted)] [--stagger-index:1]">
-            Cakra menggunakan mesin kecerdasan buatan yang menganalisis pola penjualan historis toko Anda secara
-            real-time. Sistem kami juga mendeteksi tren musiman lokal, hari raya, dan waktu pengiriman pemasok (lead
-            time) sehingga setiap keputusan stok berjalan lebih produktif.
+            Unggah riwayat penjualan, lengkapi stok dan lead time pemasok, lalu Cakra menghitung batas pemesanan ulang
+            untuk tiap SKU. Tim toko tetap mengambil keputusan, datanya yang dibuat lebih rapi.
           </p>
 
           <div className="animate-stagger-rise mt-8 flex flex-col gap-4 [--stagger-index:2] sm:flex-row sm:items-center">

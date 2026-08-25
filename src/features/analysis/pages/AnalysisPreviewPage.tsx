@@ -2,9 +2,16 @@ import { Navbar } from '../../home/components/Navbar'
 import { navigateTo } from '../../../shared/utils/navigation'
 import { AnalysisStepper, PreviewSummaryBar, PreviewValidationTable } from '../components'
 import { analysisSteps } from '../data/analysisSteps'
-import { previewErrorRows, previewValidRows } from '../data/previewData'
+import { getStoredUpload } from '../services/analysisStorage'
 
 export function AnalysisPreviewPage() {
+  const upload = getStoredUpload()
+
+  if (!upload) {
+    navigateTo('/analysis/new')
+    return null
+  }
+
   return (
     <>
       <Navbar variant="app" />
@@ -12,10 +19,14 @@ export function AnalysisPreviewPage() {
         <section className="app-container py-8 md:py-10">
           <a
             className="inline-flex items-center gap-2 text-label-sm font-bold text-[var(--color-primary)] hover:text-[var(--color-primary-hover)]"
-            href="/dashboard"
+            href="/analysis/new"
+            onClick={(event) => {
+              event.preventDefault()
+              navigateTo('/analysis/new')
+            }}
           >
             <ChevronLeftIcon />
-            Kembali ke Dashboard
+            Kembali ke Upload
           </a>
 
           <div className="mx-auto mt-8 max-w-[1200px]">
@@ -35,19 +46,28 @@ export function AnalysisPreviewPage() {
                 <CheckCircleIcon />
                 File berhasil diunggah
               </span>
-              <span className="font-mono text-[var(--color-text)]">Indomie_Goreng_Sales.xlsx · 180 baris · 12 KB</span>
+              <span className="font-mono text-[var(--color-text)]">
+                {upload.fileName} - {upload.validRowCount + upload.errorRowCount} baris - {upload.sizeLabel}
+              </span>
             </section>
 
             <div className="mt-6">
-              <PreviewValidationTable rows={previewValidRows} title="Data Valid (175 baris)" tone="success" />
+              <PreviewValidationTable
+                hiddenRowCount={Math.max(0, upload.validRowCount - upload.validRows.length)}
+                rows={upload.validRows}
+                title={`Data Valid (${upload.validRowCount} baris)`}
+                tone="success"
+              />
             </div>
 
-            <div className="mt-6">
-              <PreviewValidationTable rows={previewErrorRows} title="Data Error (5 baris)" tone="danger" />
-            </div>
+            {upload.errorRowCount ? (
+              <div className="mt-6">
+                <PreviewValidationTable rows={upload.errors} title={`Data Error (${upload.errorRowCount} baris)`} tone="danger" />
+              </div>
+            ) : null}
 
             <div className="mt-6">
-              <PreviewSummaryBar />
+              <PreviewSummaryBar errorCount={upload.errorRowCount} validCount={upload.validRowCount} />
             </div>
 
             <div className="mx-auto mt-8 flex max-w-[520px] flex-col gap-4 sm:flex-row sm:items-center">
@@ -63,13 +83,15 @@ export function AnalysisPreviewPage() {
                 onClick={() => navigateTo('/analysis/new/config')}
                 type="button"
               >
-                Lanjutkan
+                Lanjutkan ke Konfigurasi
               </button>
             </div>
 
-            <p className="mt-3 text-center text-body-sm text-[var(--color-text-muted)]">
-              5 baris error akan diabaikan dalam analisis
-            </p>
+            {upload.errorRowCount ? (
+              <p className="mt-3 text-center text-body-sm text-[var(--color-text-muted)]">
+                {upload.errorRowCount} baris error akan diabaikan dalam analisis
+              </p>
+            ) : null}
           </div>
         </section>
       </main>

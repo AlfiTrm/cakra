@@ -122,10 +122,8 @@ function App() {
     route = <AnalysisPreviewPage />
   } else if (path === '/analysis/new') {
     route = <NewAnalysisPage />
-  } else if (path === '/analysis/indomie-goreng') {
-    route = <AnalysisResultPage />
   } else if (path.startsWith('/analysis/')) {
-    route = <AppPlaceholder title="Detail Analisis" />
+    route = <AnalysisResultPage sessionId={path.split('/').filter(Boolean)[1] ?? ''} />
   } else if (path === '/settings') {
     route = <AppPlaceholder title="Pengaturan" />
   } else if (path === '/dashboard') {

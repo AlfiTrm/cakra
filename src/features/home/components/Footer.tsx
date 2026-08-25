@@ -46,8 +46,7 @@ export function Footer() {
           <div>
             <img alt="Cakra" className="h-10 w-auto" src={logoNeutral} />
             <p className="mt-5 max-w-[320px] text-body-sm text-[var(--color-neutral-400)]">
-              Solusi cerdas bagi ritel modern Indonesia untuk merevolusi rantai pasok dengan efisiensi tingkat
-              tinggi berbasis AI.
+              Bantu toko membaca riwayat penjualan, menghitung kebutuhan restock, dan menjaga stok penting tetap aman.
             </p>
           </div>
 
@@ -70,7 +69,7 @@ export function Footer() {
         </div>
 
         <div className="mt-14 flex flex-col gap-6 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-body-sm text-[var(--color-neutral-500)]">© 2026 Cakra. All rights reserved.</p>
+          <p className="text-body-sm text-[var(--color-neutral-500)]">&copy; 2026 Cakra. All rights reserved.</p>
 
           <div className="flex items-center gap-3">
             {socialLinks.map((social) => (

@@ -1,8 +1,8 @@
 import { Icon } from '@iconify/react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import logoPrimary from '../../../assets/brand/logo-primary-default.svg'
 import logoSecondary from '../../../assets/brand/logo-secondary-default.svg'
-import { Button } from '../../../shared/components'
+import { Button, ConfirmModal } from '../../../shared/components'
 import { logout, getStoredUserName } from '../../../shared/services/authToken'
 import { navigateTo } from '../../../shared/utils/navigation'
 import { logoutSession } from '../../auth/services/authService'
@@ -15,12 +15,39 @@ export function Navbar({ availableCredits = 18, totalCredits = 50, userName, var
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isMenuVisible, setIsMenuVisible] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [activeHash, setActiveHash] = useState('#beranda')
   const isPublic = variant === 'public'
   const links = isPublic ? publicLinks : appLinks
+  const homeHref = isPublic ? '/' : '/dashboard'
   const currentPath = window.location.pathname
   const displayName = userName ?? getStoredUserName() ?? 'Pengguna'
   const creditPercent = Math.max(0, Math.min(Math.round((availableCredits / Math.max(totalCredits, 1)) * 100), 100))
   useBodyScrollLock(isProfileOpen || isMenuOpen)
+
+  useEffect(() => {
+    if (!isPublic) return
+
+    const sections = publicLinks
+      .map((link) => document.querySelector<HTMLElement>(link.href))
+      .filter((section): section is HTMLElement => Boolean(section))
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntry = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+
+        if (visibleEntry?.target.id) setActiveHash(`#${visibleEntry.target.id}`)
+      },
+      { rootMargin: '-88px 0px -55% 0px', threshold: [0.12, 0.32, 0.56] },
+    )
+
+    sections.forEach((section) => observer.observe(section))
+
+    return () => observer.disconnect()
+  }, [isPublic])
 
   function openMenu() {
     setIsMenuOpen(true)
@@ -33,32 +60,50 @@ export function Navbar({ availableCredits = 18, totalCredits = 50, userName, var
   }
 
   async function handleLogout() {
+    setIsLoggingOut(true)
+
     try {
       await logoutSession()
     } finally {
+      setIsLoggingOut(false)
+      setIsLogoutConfirmOpen(false)
       setIsProfileOpen(false)
       logout()
     }
+  }
+
+  function handlePublicLinkClick(href: string) {
+    const section = document.querySelector<HTMLElement>(href)
+    if (!section) return
+
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    window.history.replaceState({}, '', href)
+    setActiveHash(href)
   }
 
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-50 bg-[var(--color-surface)]">
         <nav className="app-container relative flex h-[72px] items-center justify-between gap-6">
-          <a aria-label="Cakra home" className="z-10 shrink-0" href="/">
+          <a aria-label="Cakra home" className="z-10 shrink-0" href={homeHref}>
             <img alt="Cakra" className="hidden h-8 w-auto lg:block" src={logoPrimary} />
             <img alt="Cakra" className="size-10 lg:hidden" src={logoSecondary} />
           </a>
 
           <div className="group/nav absolute left-1/2 hidden -translate-x-1/2 items-center gap-10 lg:flex">
-            {links.map((link, index) => {
-              const isActive = isPublic ? index === 0 : currentPath === link.href
+            {links.map((link) => {
+              const isActive = isPublic ? activeHash === link.href : currentPath === link.href
 
               return (
                 <a
                   className="group/link flex flex-col items-center gap-2 text-label-md font-semibold text-[var(--color-text)] transition-colors hover:text-[var(--color-primary)]"
                   href={link.href}
                   key={link.label}
+                  onClick={(event) => {
+                    if (!isPublic) return
+                    event.preventDefault()
+                    handlePublicLinkClick(link.href)
+                  }}
                 >
                   <span>{link.label}</span>
                   <span
@@ -139,7 +184,19 @@ export function Navbar({ availableCredits = 18, totalCredits = 50, userName, var
             displayName={displayName}
             totalCredits={totalCredits}
             onClose={() => setIsProfileOpen(false)}
-            onLogout={handleLogout}
+            onLogout={() => setIsLogoutConfirmOpen(true)}
+          />
+          <ConfirmModal
+            confirmLabel="Keluar"
+            description="Sesi akun akan ditutup dan Anda perlu masuk kembali untuk mengakses dashboard."
+            isLoading={isLoggingOut}
+            isOpen={isLogoutConfirmOpen}
+            title="Keluar dari akun?"
+            variant="danger"
+            onClose={() => {
+              if (!isLoggingOut) setIsLogoutConfirmOpen(false)
+            }}
+            onConfirm={handleLogout}
           />
         </>
       ) : null}
@@ -151,7 +208,9 @@ export function Navbar({ availableCredits = 18, totalCredits = 50, userName, var
           }`}
         >
           <div className="app-container flex h-[72px] items-center justify-between">
-            <img alt="Cakra" className="size-10" src={logoSecondary} />
+            <a aria-label="Cakra home" href={homeHref}>
+              <img alt="Cakra" className="size-10" src={logoSecondary} />
+            </a>
             <button
               aria-label="Close navigation menu"
               className="grid size-11 place-items-center rounded-[var(--radius-lg)] text-[var(--color-text)]"
@@ -168,8 +227,8 @@ export function Navbar({ availableCredits = 18, totalCredits = 50, userName, var
             }`}
           >
             <div className="grid gap-5">
-              {links.map((link, index) => {
-                const isActive = isPublic ? index === 0 : currentPath === link.href
+              {links.map((link) => {
+                const isActive = isPublic ? activeHash === link.href : currentPath === link.href
 
                 return (
                   <a
@@ -180,7 +239,13 @@ export function Navbar({ availableCredits = 18, totalCredits = 50, userName, var
                     }`}
                     href={link.href}
                     key={link.label}
-                    onClick={closeMenu}
+                    onClick={(event) => {
+                      if (isPublic) {
+                        event.preventDefault()
+                        handlePublicLinkClick(link.href)
+                      }
+                      closeMenu()
+                    }}
                   >
                     {link.label}
                   </a>
