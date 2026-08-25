@@ -6,16 +6,16 @@ const marketplaceLogos = ['Tokopedia', 'Shopee', 'Grab', 'Bukalapak', 'Alfamart'
 
 export function HeroSection() {
   return (
-    <section className="is-stagger-visible bg-[var(--color-surface)]">
-      <div className="app-container flex min-h-[560px] flex-col items-center justify-center py-16 text-center md:min-h-[620px] md:py-20">
-        <h1 className="animate-stagger-rise max-w-[780px] text-display-sm text-[var(--color-text)] [--stagger-index:0] md:text-[56px] md:leading-[64px]">
+    <section className="is-stagger-visible scroll-mt-[72px] bg-[var(--color-surface)]" id="beranda">
+      <div className="app-container flex min-h-[500px] flex-col items-center justify-center py-14 text-center md:min-h-[600px] md:py-20">
+        <h1 className="animate-stagger-rise max-w-[760px] text-display-sm text-[var(--color-text)] [--stagger-index:0] md:text-[56px] md:leading-[64px]">
           Restock lebih pasti untuk
           <span className="block text-[var(--color-primary)]">bisnis yang bergerak cepat</span>
         </h1>
 
         <p className="animate-stagger-rise mt-6 max-w-[640px] text-body-lg text-[var(--color-text-muted)] [--stagger-index:1]">
-          Cakra membaca pola penjualan per SKU, lalu memberi rekomendasi kapan harus restock dan berapa banyak yang
-          perlu dipesan.
+          Pantau pola penjualan per SKU, lihat risiko stok lebih awal, dan dapatkan angka restock yang siap
+          dijalankan.
         </p>
 
         <div className="animate-stagger-rise mt-9 flex flex-col items-center gap-3 [--stagger-index:2] sm:flex-row">
@@ -29,7 +29,7 @@ export function HeroSection() {
 
         <div className="animate-stagger-rise mt-14 [--stagger-index:3]">
           <p className="text-label-sm font-semibold text-[var(--color-text-muted)]">
-            Terhubung dengan marketplace yang dipakai toko Indonesia
+            Siap dipakai bersama kanal penjualan toko Indonesia
           </p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-x-10 gap-y-3">
             {marketplaceLogos.map((logo) => (

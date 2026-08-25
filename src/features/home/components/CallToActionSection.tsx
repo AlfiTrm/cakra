@@ -24,25 +24,24 @@ export function CallToActionSection() {
           <span className="block">Stok Anda</span>
         </h2>
         <p className="animate-stagger-rise mx-auto mt-8 max-w-[600px] text-body-sm text-[var(--color-primary-100)] [--stagger-index:1]">
-          Bergabunglah dengan 500+ pemilik toko ritel di Indonesia yang sudah mengurangi stok mati dan meningkatkan
-          omset dengan AI Cakra.
+          Mulai dari satu file penjualan. Dapatkan rekomendasi restock pertama tanpa kartu kredit.
         </p>
 
         <form
-          className="animate-stagger-rise mx-auto mt-9 flex max-w-[580px] flex-col gap-3 rounded-[var(--radius-lg)] bg-[var(--color-neutral-900)] p-2 [--stagger-index:2] sm:h-16 sm:flex-row sm:rounded-[var(--radius-full)]"
+          className="animate-stagger-rise mx-auto mt-9 flex max-w-[580px] flex-col gap-3 rounded-[var(--radius-lg)] border border-white/20 bg-white/10 p-2 [--stagger-index:2] sm:h-16 sm:flex-row sm:rounded-[var(--radius-full)]"
           onSubmit={handleSubmit}
         >
           <label className="sr-only" htmlFor="cta-email">
             Alamat email
           </label>
           <input
-            className="min-h-12 flex-1 bg-transparent px-5 text-label-md text-white outline-none placeholder:text-[var(--color-neutral-400)]"
+            className="min-h-12 flex-1 bg-transparent px-5 text-label-md text-white outline-none placeholder:text-[var(--color-primary-100)]"
             id="cta-email"
             placeholder="Masukkan alamat email Anda"
             type="email"
           />
           <button
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-[var(--radius-lg)] bg-white px-7 text-label-md font-bold text-[var(--color-primary)] transition-colors hover:bg-[var(--color-primary-50)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-primary-200)] sm:rounded-[var(--radius-full)]"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-[var(--radius-lg)] bg-[var(--color-neutral-900)] px-7 text-label-md font-bold text-white transition-colors hover:bg-[var(--color-neutral-800)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-primary-200)] sm:rounded-[var(--radius-full)]"
             type="submit"
           >
             Daftar Sekarang

@@ -38,7 +38,7 @@ export function PricingSection() {
     <section
       id="harga"
       ref={ref}
-      className={`bg-[var(--color-neutral-900)] py-20 md:py-24 ${isVisible ? 'is-stagger-visible' : ''}`}
+      className={`scroll-mt-[72px] bg-[var(--color-neutral-900)] py-20 md:py-24 ${isVisible ? 'is-stagger-visible' : ''}`}
     >
       <div className="app-container">
         <div className="animate-stagger-rise mx-auto max-w-[620px] text-center [--stagger-index:0]">
@@ -46,7 +46,7 @@ export function PricingSection() {
             Satu Kredit = Satu Analisis SKU
           </h2>
           <p className="mt-4 text-body-sm text-[var(--color-neutral-400)]">
-            Pilih paket kuota kredit sesuai kebutuhan toko Anda. Tidak ada biaya langganan bulanan yang mengikat.
+            Pakai kredit sesuai jumlah SKU yang perlu dianalisis. Tidak ada paket bulanan yang mengikat.
           </p>
         </div>
 

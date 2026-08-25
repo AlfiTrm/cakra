@@ -31,7 +31,7 @@ export function LatestAnalysisTable({ analyses, isSearching = false, onSearchCha
         />
       </header>
 
-      <AnalysisTable maxBodyHeight={360} rows={analyses} />
+      <AnalysisTable maxBodyHeight={360} rows={analyses} showActions onView={(row) => navigateTo(`/analysis/${row.sessionId ?? row.id}`)} />
 
       <footer className="flex justify-center border-t border-[var(--color-border)] px-6 py-5">
         <button

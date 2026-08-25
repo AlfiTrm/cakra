@@ -1,8 +1,8 @@
 export const publicLinks = [
-  { href: '#fitur', label: 'Fitur' },
+  { href: '#beranda', label: 'Beranda' },
   { href: '#cara-kerja', label: 'Cara Kerja' },
+  { href: '#fitur', label: 'Fitur' },
   { href: '#harga', label: 'Harga' },
-  { href: '#faq', label: 'FAQ' },
 ]
 
 export const appLinks = [

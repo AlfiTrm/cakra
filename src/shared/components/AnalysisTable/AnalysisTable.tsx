@@ -85,24 +85,26 @@ export function AnalysisTable({
                 {showActions ? (
                   <td className={`sticky right-0 px-6 py-4 ${rowBg}`}>
                     <div className="flex justify-end gap-2">
-                      <button
-                        aria-label={`Lihat analisis ${analysis.skuName}`}
-                        className="grid size-8 place-items-center rounded-[var(--radius-md)] bg-[var(--color-primary-50)] text-[var(--color-primary)] transition-colors hover:bg-[var(--color-primary-100)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-primary-100)] disabled:pointer-events-none disabled:opacity-45"
-                        disabled={!onView}
-                        onClick={() => onView?.(analysis)}
-                        type="button"
-                      >
-                        <EyeIcon />
-                      </button>
-                      <button
-                        aria-label={`Unduh analisis ${analysis.skuName}`}
-                        className="grid size-8 place-items-center rounded-[var(--radius-md)] bg-[var(--color-success-50)] text-[var(--color-success)] transition-colors hover:bg-[var(--color-success-100)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-success-100)] disabled:pointer-events-none disabled:opacity-45"
-                        disabled={!onDownload}
-                        onClick={() => onDownload?.(analysis)}
-                        type="button"
-                      >
-                        <DownloadIcon />
-                      </button>
+                      {onView ? (
+                        <button
+                          aria-label={`Lihat analisis ${analysis.skuName}`}
+                          className="grid size-8 place-items-center rounded-[var(--radius-md)] bg-[var(--color-primary-50)] text-[var(--color-primary)] transition-colors hover:bg-[var(--color-primary-100)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-primary-100)]"
+                          onClick={() => onView(analysis)}
+                          type="button"
+                        >
+                          <EyeIcon />
+                        </button>
+                      ) : null}
+                      {onDownload ? (
+                        <button
+                          aria-label={`Unduh analisis ${analysis.skuName}`}
+                          className="grid size-8 place-items-center rounded-[var(--radius-md)] bg-[var(--color-success-50)] text-[var(--color-success)] transition-colors hover:bg-[var(--color-success-100)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--color-success-100)]"
+                          onClick={() => onDownload(analysis)}
+                          type="button"
+                        >
+                          <DownloadIcon />
+                        </button>
+                      ) : null}
                     </div>
                   </td>
                 ) : null}

@@ -1,5 +1,6 @@
 export { AnalysisTable } from './AnalysisTable'
 export { Button } from './Button'
+export { ConfirmModal } from './ConfirmModal'
 export { SearchInput } from './Input'
 export { LoadingContent, LoadingPage, NotFoundPage } from './feedback'
 export type { AnalysisRiskStatus, AnalysisTableRow } from './AnalysisTable'

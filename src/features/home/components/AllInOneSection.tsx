@@ -6,22 +6,22 @@ const features = [
   {
     icon: 'lucide:bar-chart-3',
     title: 'Prediksi Demand AI',
-    description: 'Proyeksikan potensi penjualan per SKU dengan skenario P50 dan P90. Meminimalkan risiko terlalu banyak membeli.',
+    description: 'Lihat proyeksi permintaan per SKU dalam skenario normal dan batas atas.',
   },
   {
     icon: 'lucide:triangle-alert',
     title: 'Klasifikasi Risiko Otomatis',
-    description: 'Sistem mendeteksi dan menandai SKU mana yang berisiko Stockout, Normal, atau berpotensi menjadi Deadstock.',
+    description: 'Tandai SKU yang normal, hampir habis, atau berisiko jadi stok mati.',
   },
   {
     icon: 'lucide:arrow-left-right',
     title: 'Rekomendasi Restock Presisi',
-    description: 'Dapatkan saran jumlah order dan waktu restock terbaik. Cukup ikuti instruksi, operasional toko pun aman.',
+    description: 'Dapatkan batas restock dan jumlah order yang bisa langsung dipakai tim operasional.',
   },
   {
     icon: 'lucide:layout-grid',
     title: 'Analisis Per-SKU Detail',
-    description: 'Pelajari kontribusi keuntungan dari setiap barang dagangan Anda dengan rincian data margin dan turn-rate yang jelas.',
+    description: 'Baca hasil analisis historis tanpa menebak ulang dari spreadsheet mentah.',
   },
 ]
 
@@ -32,7 +32,7 @@ export function AllInOneSection() {
     <section
       id="fitur"
       ref={ref}
-      className={`bg-[var(--color-surface)] py-16 md:py-24 ${isVisible ? 'is-stagger-visible' : ''}`}
+      className={`scroll-mt-[72px] bg-[var(--color-surface)] py-16 md:py-24 ${isVisible ? 'is-stagger-visible' : ''}`}
     >
       <div className="app-container">
         <h2 className="animate-stagger-rise mx-auto max-w-[920px] text-center text-display-sm text-[var(--color-text)] [--stagger-index:0] md:text-[40px] md:leading-[48px]">

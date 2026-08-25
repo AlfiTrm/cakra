@@ -17,19 +17,33 @@ export function AnalysisStepper({ activeStep = 1, steps }: AnalysisStepperProps)
             <div className="flex items-center gap-3">
               <span
                 className={`grid size-8 shrink-0 place-items-center rounded-[var(--radius-full)] border text-label-md font-bold ${
-                  isActive || isComplete
+                  isComplete
+                    ? 'border-[var(--color-success)] bg-[var(--color-success)] text-white shadow-md shadow-[rgb(5_150_105_/_0.22)]'
+                    : isActive
                     ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white shadow-md shadow-[rgb(45_82_221_/_0.22)]'
                     : 'border-[var(--color-border)] bg-white text-[var(--color-text-muted)]'
                 }`}
               >
                 {isComplete ? <CheckIcon /> : step.id}
               </span>
-              <span className={`text-label-md font-bold ${isActive || isComplete ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-muted)]'}`}>
+              <span
+                className={`text-label-md font-bold ${
+                  isComplete
+                    ? 'text-[var(--color-success)]'
+                    : isActive
+                    ? 'text-[var(--color-primary)]'
+                    : 'text-[var(--color-text-muted)]'
+                }`}
+              >
                 {step.label}
               </span>
             </div>
             {index < steps.length - 1 ? (
-              <span className={`hidden h-px w-16 border-t md:block ${isComplete ? 'border-[var(--color-primary)]' : 'border-dashed border-[var(--color-border)]'}`} />
+              <span
+                className={`hidden h-px w-16 border-t md:block ${
+                  isComplete ? 'border-[var(--color-success)]' : 'border-dashed border-[var(--color-border)]'
+                }`}
+              />
             ) : null}
           </li>
         )
