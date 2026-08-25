@@ -1,1 +1,1 @@
-export const API_BASE_URL = (import.meta.env.VITE_BASE_API ?? '').replace(/\/$/, '')
+export const API_BASE_URL = import.meta.env.VITE_BASE_API.trim().replace(/\/+$/, '')

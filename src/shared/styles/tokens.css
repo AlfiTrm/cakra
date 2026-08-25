@@ -103,8 +103,8 @@
 
   --text-display-lg: 48px;
   --leading-display-lg: 56px;
-  --text-display-sm: 36px;
-  --leading-display-sm: 44px;
+  --text-display-sm: 34px;
+  --leading-display-sm: 42px;
 
   --text-heading-xl: 30px;
   --leading-heading-xl: 38px;
@@ -131,8 +131,8 @@
   --text-label-sm: 12px;
   --leading-label-sm: 16px;
 
-  --text-data-xl: 36px;
-  --leading-data-xl: 44px;
+  --text-data-xl: 32px;
+  --leading-data-xl: 40px;
   --text-data-lg: 24px;
   --leading-data-lg: 32px;
   --text-data-md: 20px;
@@ -164,7 +164,7 @@
   --container-md: 768px;
   --container-lg: 1024px;
   --container-xl: 1200px;
-  --container-padding: var(--space-4);
+  --container-padding: var(--space-6);
 
   --radius-none: 0;
   --radius-sm: 4px;

@@ -6,6 +6,7 @@ html {
   font-family: var(--font-sans);
   color: var(--color-text);
   background: var(--color-background);
+  scroll-behavior: smooth;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -36,7 +37,7 @@ button {
 
 @media (min-width: 768px) {
   :root {
-    --container-padding: var(--space-6);
+    --container-padding: var(--space-8);
   }
 }
 
