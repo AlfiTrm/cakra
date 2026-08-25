@@ -8,7 +8,7 @@ export const analysisSteps: AnalysisStep[] = [
 ]
 
 export const demoUploadFile: UploadFileState = {
-  name: 'Indomie_Goreng_Sales.csv',
+  name: 'Indomie_Goreng_Sales.xlsx',
   rows: 180,
   sizeLabel: '12 KB',
 }

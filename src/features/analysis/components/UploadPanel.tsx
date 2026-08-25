@@ -10,7 +10,7 @@ type UploadPanelProps = {
 }
 
 const maxFileSize = 2 * 1024 * 1024
-const allowedExtensions = ['csv', 'xlsx']
+const allowedExtension = 'xlsx'
 
 export function UploadPanel({ file, isUploading = false, onFileChange, onFileSelect }: UploadPanelProps) {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -21,10 +21,10 @@ export function UploadPanel({ file, isUploading = false, onFileChange, onFileSel
     if (!nextFile) return
 
     const extension = nextFile.name.split('.').pop()?.toLowerCase() ?? ''
-    if (!allowedExtensions.includes(extension)) {
+    if (extension !== allowedExtension) {
       setInlineError({
         fileName: nextFile.name,
-        message: 'Hanya file .csv atau .xlsx yang diterima',
+        message: 'Hanya file .xlsx yang diterima',
       })
       onFileChange(null)
       return
@@ -89,7 +89,7 @@ export function UploadPanel({ file, isUploading = false, onFileChange, onFileSel
             inlineError ? 'text-[var(--color-danger)]' : isDragging ? 'text-[var(--color-primary)]' : 'text-[var(--color-text)]'
           }`}
         >
-          {isUploading ? 'Mengunggah dan memvalidasi file...' : inlineError ? 'Format file tidak didukung' : isDragging ? 'Lepaskan file untuk mengunggah' : 'Seret file CSV/XLSX ke sini atau klik untuk memilih'}
+          {isUploading ? 'Mengunggah dan memvalidasi file...' : inlineError ? 'Format file tidak didukung' : isDragging ? 'Lepaskan file untuk mengunggah' : 'Seret file XLSX ke sini atau klik untuk memilih'}
         </span>
         <span className={`mt-2 text-body-sm ${inlineError ? 'text-[var(--color-danger-700)]' : 'text-[var(--color-text-muted)]'}`}>
           {isUploading ? (
@@ -101,14 +101,11 @@ export function UploadPanel({ file, isUploading = false, onFileChange, onFileSel
           ) : isDragging ? (
             'Sistem akan memvalidasi data Anda secara instan'
           ) : (
-            'Format: CSV/XLSX - Maks 2MB - Kolom wajib: tanggal, jumlah_terjual'
+            'Format: XLSX - Maks 2MB - Minimal 90 hari data penjualan'
           )}
         </span>
         {isDragging && !inlineError && !isUploading ? (
           <span className="mt-5 flex flex-wrap items-center justify-center gap-2">
-            <span className="rounded-[var(--radius-full)] bg-white px-3 py-1 text-label-sm font-bold text-[var(--color-primary)] shadow-sm">
-              CSV
-            </span>
             <span className="rounded-[var(--radius-full)] bg-white px-3 py-1 text-label-sm font-bold text-[var(--color-primary)] shadow-sm">
               XLSX
             </span>
@@ -120,7 +117,7 @@ export function UploadPanel({ file, isUploading = false, onFileChange, onFileSel
       </button>
 
       <input
-        accept=".csv,.xlsx"
+        accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         className="sr-only"
         onChange={(event) => {
           handleFile(event.target.files?.[0])
@@ -136,10 +133,10 @@ export function UploadPanel({ file, isUploading = false, onFileChange, onFileSel
         <a
           className="flex w-fit items-center gap-2 text-label-md font-bold text-[var(--color-primary)] hover:text-[var(--color-primary-hover)]"
           download
-          href="/template-analysis.csv"
+          href="/template/template_file.xlsx"
         >
           <DownloadIcon />
-          Unduh template CSV contoh
+          Unduh template XLSX
         </a>
         {inlineError ? (
           <button

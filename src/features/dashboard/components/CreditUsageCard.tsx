@@ -6,7 +6,7 @@ type CreditUsageCardProps = {
 }
 
 export function CreditUsageCard({ usage }: CreditUsageCardProps) {
-  const totalCredits = Math.max(usage.balance, usage.availableCredits + usage.reservedCredits, 1)
+  const totalCredits = Math.max(usage.availableCredits + usage.usedThisMonth, usage.availableCredits + usage.reservedCredits, 1)
   const remainingPercent = Math.round((usage.availableCredits / totalCredits) * 100)
 
   return (

@@ -164,9 +164,6 @@ export function AnalysisConfigPage() {
                   </Field>
                 </div>
 
-                <Field helper="Standar aman untuk menjaga stok tetap tersedia saat permintaan naik." label="Target Ketersediaan Stok">
-                  <CustomDropdown disabled options={['95%']} value="95%" />
-                </Field>
               </div>
             </section>
 

@@ -43,7 +43,9 @@ export function DashboardPage() {
     <>
       <Navbar
         availableCredits={dashboard?.creditUsage.availableCredits}
-        totalCredits={dashboard?.creditUsage.balance}
+        totalCredits={
+          dashboard ? Math.max(dashboard.creditUsage.availableCredits + dashboard.creditUsage.usedThisMonth, dashboard.creditUsage.availableCredits + dashboard.creditUsage.reservedCredits) : undefined
+        }
         userName={dashboard?.userName}
         variant="app"
       />
